@@ -8,16 +8,16 @@ import (
 )
 
 func GetRestaurants() (*http.Response, error) {
-	req := getRequestHandler()
+	req := GetRequestHandler()
 
-	resp, err := getRestaurantsFromApi(req)
+	resp, err := GetRestaurantsFromApi(req)
 	if err != nil {
 		return nil, err
 	}
 	return resp, nil
 }
 
-func getRequestHandler() *http.Request {
+func GetRequestHandler() *http.Request {
 	const payload = `{"operationName":"getRestaurantsByLocation","variables":{"first":1000,"input":{"restaurantType":"ALL","locationName":"Helsinki","feature":{"rentableVenues":false}},"after":"eyJmIjowLCJnIjp7ImEiOjYwLjE3MTE2LCJvIjoyNC45MzI1OH19"},"query":"fragment Locales on LocalizedString {fi_FI }fragment Restaurant on Restaurant {  id  name {    ...Locales    }  address {    municipality {      ...Locales       }        street {      ...Locales       }       zipCode     }   openingTime {    restaurantTime {      ranges {        start        end             }             }    kitchenTime {      ranges {        start        end        endNextDay              }             }    }  links {    tableReservationLocalized {      ...Locales        }    homepageLocalized {      ...Locales          }   }     }query getRestaurantsByLocation($first: Int, $after: String, $input: ListRestaurantsByLocationInput!) {  listRestaurantsByLocation(first: $first, after: $after, input: $input) {    totalCount      edges {      ...Restaurant        }     }}"}`
 	req, err := http.NewRequest("POST", "https://api.raflaamo.fi/query", bytes.NewBuffer([]byte(payload)))
 	if err != nil {
@@ -28,7 +28,8 @@ func getRequestHandler() *http.Request {
 	req.Header.Add("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
 	return req
 }
-func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
+
+var GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
 	if err != nil {
