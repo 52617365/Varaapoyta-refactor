@@ -33,17 +33,21 @@ func TestGetRequestHandler(t *testing.T) {
 func TestGetValidRestaurants(t *testing.T) {
 	GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
 		resp := &http.Response{
-			Status: "200",
+			Status:     "200 OK",
+			StatusCode: 200,
 		}
 		return resp, nil
+	}
+	ReadResponseBuffer = func(res *http.Response) (string, error) {
+		return "test", nil
 	}
 
 	req, err := GetRestaurants()
 	if err != nil {
 		t.Errorf("GetRestaurants - Threw an unexpected error.")
 	}
-	if req.Status != "200" {
-		t.Errorf("GetRestaurants - expected status to be 200, got %v", req.Status)
+	if req != "test" {
+		t.Errorf("GetRestaurants - Did not return the expected response.")
 	}
 
 }
