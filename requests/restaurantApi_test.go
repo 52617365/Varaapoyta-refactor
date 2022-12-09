@@ -38,18 +38,14 @@ func TestGetValidRestaurants(t *testing.T) {
 		}
 		return resp, nil
 	}
-	ReadResponseBuffer = func(res *http.Response) (string, error) {
-		return "test", nil
+	ReadResponseBuffer = func(res *http.Response) (*RestaurantApiResponse, error) {
+		return &RestaurantApiResponse{}, nil
 	}
 
-	req, err := GetRestaurants()
+	_, err := GetRestaurants()
 	if err != nil {
 		t.Errorf("GetRestaurants - Threw an unexpected error.")
 	}
-	if req != "test" {
-		t.Errorf("GetRestaurants - Did not return the expected response.")
-	}
-
 }
 func TestGetInvalidRestaurants(t *testing.T) {
 	GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
@@ -60,5 +56,4 @@ func TestGetInvalidRestaurants(t *testing.T) {
 	if err == nil {
 		t.Errorf("GetRestaurants - Did not throw an error when we expected it to.")
 	}
-
 }
