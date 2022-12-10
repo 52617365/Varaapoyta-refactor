@@ -2,33 +2,9 @@ package requests
 
 import (
 	"errors"
-	"golang.org/x/exp/slices"
 	"net/http"
 	"testing"
 )
-
-func TestGetRequestHandler(t *testing.T) {
-	expectedHeaderKeys := []string{"Content-Type", "Client_id", "User-Agent"}
-	expectedHeaderValues := []string{"application/json", "jNAWMvWD9rp637RaR", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
-
-	req := GetRequestHandler()
-
-	for key, value := range req.Header {
-		if !slices.Contains(expectedHeaderKeys, key) {
-			t.Errorf("GetRequestHandler - header key %v not found", key)
-		}
-		if !slices.Contains(expectedHeaderValues, value[0]) {
-			t.Errorf("GetRequestHandler - header value %v not found", value)
-		}
-	}
-	if req.Method != "POST" {
-		t.Errorf("GetRequestHandler - expected method to be POST, got %v", req.Method)
-	}
-	if req.URL.String() != "https://api.raflaamo.fi/query" {
-		t.Errorf("GetRequestHandler - expected url to be https://api.raflaamo.fi/query, got %v", req.URL.String())
-	}
-
-}
 
 func TestGetValidRestaurants(t *testing.T) {
 	GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
