@@ -5,6 +5,27 @@ import (
 	"net/http"
 )
 
+var timeSlots = [...]string{"0800", "1200", "1600", "2000"}
+
+//func GetGraphApiTimeSlotsFor(restaurantId int) []string {
+//
+//}
+
+func getUrls(restaurantId int) []string {
+	var urls []string
+	for _, timeSlot := range timeSlots {
+		url := getUrl(restaurantId, timeSlot)
+		urls = append(urls, url)
+	}
+	return urls
+}
+func getUrl(restaurantId int, timeSlot string) string {
+	// TODO: get current date inside of this function instead of passing it in.
+	currentDate := "TODO" // E.g. 2022-08-12
+
+	url := fmt.Sprintf(`https://s-varaukset.fi/api/recommendations/slot/%d/%s/%s/1`, restaurantId, currentDate, timeSlot)
+	return url
+}
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
 	requestHandler := getGraphApiRequestHandler(requestUrl)
 	response, err := sendRequestToGraphApi(requestHandler)
