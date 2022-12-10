@@ -3,11 +3,12 @@ package requests
 import (
 	"fmt"
 	"testing"
+	"varaapoyta-backend-refactor/date"
 )
 
 func TestGetUrl(t *testing.T) {
 	restaurantId := 1
-	currentDate := getCurrentDate()
+	currentDate := date.GetCurrentDate()
 	timeSlot := "0800"
 	expectedUrl := fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/0800/1", currentDate)
 	actualUrl := getUrl(restaurantId, timeSlot)
@@ -18,7 +19,7 @@ func TestGetUrl(t *testing.T) {
 
 func TestGetUrls(t *testing.T) {
 	restaurantId := 1
-	currentDate := getCurrentDate()
+	currentDate := date.GetCurrentDate()
 	expectedUrls := []string{
 		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/0800/1", currentDate),
 		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/1200/1", currentDate),

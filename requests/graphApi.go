@@ -3,8 +3,7 @@ package requests
 import (
 	"fmt"
 	"net/http"
-	"strings"
-	"time"
+	"varaapoyta-backend-refactor/date"
 )
 
 var GraphApiTimeslots = [...]string{"0800", "1200", "1600", "2000"}
@@ -23,16 +22,10 @@ func getUrls(restaurantId int) []string {
 	return urls
 }
 func getUrl(restaurantId int, timeSlot string) string {
-	currentDate := getCurrentDate()
+	currentDate := date.GetCurrentDate()
 
 	url := fmt.Sprintf(`https://s-varaukset.fi/api/recommendations/slot/%d/%s/%s/1`, restaurantId, currentDate, timeSlot)
 	return url
-}
-func getCurrentDate() string {
-	current := time.Now().String()
-	indexOfSpace := strings.Index(current, " ")
-	dateFromCurrent := current[:indexOfSpace]
-	return dateFromCurrent
 }
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
