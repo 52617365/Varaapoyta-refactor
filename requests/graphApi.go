@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"varaapoyta-backend-refactor/date"
+	"varaapoyta-backend-refactor/time"
 )
-
-var GraphApiTimeslots = [...]string{"0800", "1200", "1600", "2000"}
 
 //func GetGraphApiTimeSlotsFor(restaurantId int) []string {
 //	urls := getUrls(restaurantId)
@@ -15,7 +14,7 @@ var GraphApiTimeslots = [...]string{"0800", "1200", "1600", "2000"}
 
 func getUrls(restaurantId int) []string {
 	var urls []string
-	for _, timeSlot := range GraphApiTimeslots {
+	for _, timeSlot := range time.GraphApiTimeslots {
 		url := getUrl(restaurantId, timeSlot)
 		urls = append(urls, url)
 	}
