@@ -7,15 +7,16 @@ import (
 	"time"
 )
 
-var timeSlots = [...]string{"0800", "1200", "1600", "2000"}
+var GraphApiTimeslots = [...]string{"0800", "1200", "1600", "2000"}
 
 //func GetGraphApiTimeSlotsFor(restaurantId int) []string {
+//	urls := getUrls(restaurantId)
 //
 //}
 
 func getUrls(restaurantId int) []string {
 	var urls []string
-	for _, timeSlot := range timeSlots {
+	for _, timeSlot := range GraphApiTimeslots {
 		url := getUrl(restaurantId, timeSlot)
 		urls = append(urls, url)
 	}
@@ -34,6 +35,18 @@ func getCurrentDate() string {
 	return dateFromCurrent
 }
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
+	response, err := getResponseFromGraphApi(requestUrl)
+	if err != nil {
+		return nil, err
+	}
+	deserializedResponse, err := deserializeGraphApiResponse(response)
+	if err != nil {
+		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
+	}
+	return deserializedResponse, nil
+}
+
+func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
 	requestHandler := getGraphApiRequestHandler(requestUrl)
 	response, err := sendRequestToGraphApi(requestHandler)
 	if err != nil {
@@ -43,11 +56,7 @@ func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ReadResponseBuffer - Error reading response buffer. - %w", err)
 	}
-	deserializedResponse, err := deserializeGraphApiResponse(responseBuffer)
-	if err != nil {
-		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
-	}
-	return deserializedResponse, nil
+	return responseBuffer, nil
 }
 
 func getGraphApiRequestHandler(requestUrl string) *http.Request {
