@@ -1,7 +1,6 @@
 package requests
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 )
@@ -37,18 +36,19 @@ var ReadRestaurantApiResponse = func(res *http.Response) (*RestaurantApiResponse
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}
-	deserializedResponse, err := deserializeResponse(readBuffer)
+	deserializedResponse, err := deserializeRestaurantApiResponse(readBuffer)
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}
 	return deserializedResponse, nil
 }
 
-func deserializeResponse(response []byte) (*RestaurantApiResponse, error) {
+func deserializeRestaurantApiResponse(response []byte) (*RestaurantApiResponse, error) {
 	responseStructure := RestaurantApiResponse{}
-	err := json.Unmarshal(response, &responseStructure)
+	deserializedResponse, err := deserializeResponse(response, &responseStructure)
 	if err != nil {
 		return nil, err
 	}
-	return &responseStructure, nil
+	result := deserializedResponse.(*RestaurantApiResponse)
+	return result, nil
 }
