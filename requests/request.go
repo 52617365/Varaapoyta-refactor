@@ -98,9 +98,22 @@ var ReadResponseBuffer = func(res *http.Response) ([]byte, error) {
 }
 
 func deserializeResponse(response []byte, responseStructure interface{}) (interface{}, error) {
-	err := json.Unmarshal(response, &responseStructure)
+	var typeOfStructure interface{}
+
+	switch responseStructure.(type) {
+	case GraphApiResponse:
+		typeOfStructure = &GraphApiResponse{}
+		break
+	case RestaurantApiResponse:
+		typeOfStructure = &RestaurantApiResponse{}
+		break
+	default:
+		log.Fatal("Invalid response structure")
+	}
+
+	err := json.Unmarshal(response, &typeOfStructure)
 	if err != nil {
 		return nil, err
 	}
-	return &responseStructure, nil
+	return typeOfStructure, nil
 }
