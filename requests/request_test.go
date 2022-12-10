@@ -108,3 +108,25 @@ func TestSetRestaurantApiHeadersTo(t *testing.T) {
 		}
 	}
 }
+
+func TestDeserializeResponse(t *testing.T) {
+	response := `{"data": {"listRestaurantsByLocation": {"totalCount": 470}}}`
+	expectedTotalCount := 470
+
+	responseStruct := RestaurantApiResponse{}
+
+	bytes := []byte(response)
+	restaurant, err := deserializeResponse(bytes, responseStruct)
+	if err != nil {
+		t.Errorf("deserializeResponse - expectedName no error, got %v", err)
+	}
+
+	restaurantWithType, ok := restaurant.(*RestaurantApiResponse)
+	if !ok {
+		t.Errorf("deserializeResponse - expectedName restaurant to be of type TestApiFormat, got %T", restaurant)
+	}
+	if restaurantWithType.Data.ListRestaurantsByLocation.TotalCount != expectedTotalCount {
+		t.Errorf("deserializeResponse - expectedName total count to be %v, got %v", expectedTotalCount, restaurantWithType.Data.ListRestaurantsByLocation.TotalCount)
+	}
+
+}
