@@ -13,9 +13,10 @@ func GetGraphApiTimeSlotsFrom(requestUrl string) (*http.Response, error) {
 	requestHandler := GetRequestHandlerFor(&graphApi)
 	response, err := sendRequestToGraphApi(requestHandler)
 	if err != nil {
-		return nil, fmt.Errorf("sendRequestToGraphApi - Error sending request to Raflaamo graph api. - %w", err)
+		return &GraphApiResponse{}, nil
 	}
-	return response, nil
+	result := deserializedResponse.(*GraphApiResponse)
+	return result, nil
 }
 
 func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error) {
