@@ -109,7 +109,7 @@ func TestSetRestaurantApiHeadersTo(t *testing.T) {
 	}
 }
 
-func TestDeserializeResponse(t *testing.T) {
+func TestDeserializeRestaurantApiResponse(t *testing.T) {
 	response := `{"data": {"listRestaurantsByLocation": {"totalCount": 470}}}`
 	expectedTotalCount := 470
 
@@ -118,15 +118,35 @@ func TestDeserializeResponse(t *testing.T) {
 	bytes := []byte(response)
 	restaurant, err := deserializeResponse(bytes, responseStruct)
 	if err != nil {
-		t.Errorf("deserializeResponse - expectedName no error, got %v", err)
+		t.Errorf("TestDeserializeRestaurantApiResponse - expected no error, got %v", err)
 	}
 
 	restaurantWithType, ok := restaurant.(*RestaurantApiResponse)
 	if !ok {
-		t.Errorf("deserializeResponse - expectedName restaurant to be of type TestApiFormat, got %T", restaurant)
+		t.Errorf("TestDeserializeRestaurantApiResponse - expected restaurant to be of type RestaurantApiResponse, got %T", restaurant)
 	}
 	if restaurantWithType.Data.ListRestaurantsByLocation.TotalCount != expectedTotalCount {
-		t.Errorf("deserializeResponse - expectedName total count to be %v, got %v", expectedTotalCount, restaurantWithType.Data.ListRestaurantsByLocation.TotalCount)
+		t.Errorf("TestDeserializeRestaurantApiResponse - expected total count to be %v, got %v", expectedTotalCount, restaurantWithType.Data.ListRestaurantsByLocation.TotalCount)
+	}
+}
+
+func TestDeserializeGraphApiResponse(t *testing.T) {
+	response := `[{"name": "Stone's", "intervals": [{"from": 1660322700000,"to": 1660322700000,"color": "transparent"}]}]`
+	expectedName := "Stone's"
+
+	responseStruct := GraphApiResponse{}
+
+	bytes := []byte(response)
+	restaurant, err := deserializeResponse(bytes, responseStruct)
+	if err != nil {
+		t.Errorf("TestDeserializeGraphApiResponse - expected no error, got %v", err)
 	}
 
+	restaurantWithType, ok := restaurant.(*GraphApiResponse)
+	if !ok {
+		t.Errorf("TestDeserializeGraphApiResponse - expected restaurant to be of type GraphApiResponse, got %T", restaurant)
+	}
+	if (*restaurantWithType)[0].Name != expectedName {
+		t.Errorf("TestDeserializeGraphApiResponse - expected name to be %v, got %v", expectedName, (*restaurantWithType)[0].Name)
+	}
 }
