@@ -16,7 +16,6 @@ func GetGraphApiTimeSlotsFrom(requestUrl string) (*http.Response, error) {
 		return nil, fmt.Errorf("sendRequestToGraphApi - Error sending request to Raflaamo graph api. - %w", err)
 	}
 	return response, nil
-
 }
 
 func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error) {

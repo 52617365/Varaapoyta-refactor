@@ -3,7 +3,6 @@ package requests
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 )
 
@@ -20,7 +19,8 @@ func GetRestaurants() (*RestaurantApiResponse, error) {
 	if resp.StatusCode != 200 {
 		return &RestaurantApiResponse{}, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
 	}
-	response, err := ReadResponseBuffer(resp)
+	response, err := ReadRestaurantApiResponse(resp)
+
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}
@@ -32,16 +32,12 @@ func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-var ReadResponseBuffer = func(res *http.Response) (*RestaurantApiResponse, error) {
-	defer res.Body.Close()
-
-	b, err := io.ReadAll(res.Body)
-
+var ReadRestaurantApiResponse = func(res *http.Response) (*RestaurantApiResponse, error) {
+	readBuffer, err := ReadResponseBuffer(res)
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}
-
-	deserializedResponse, err := deserializeResponse(b)
+	deserializedResponse, err := deserializeResponse(readBuffer)
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}

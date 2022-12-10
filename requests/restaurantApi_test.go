@@ -14,7 +14,7 @@ func TestGetValidRestaurants(t *testing.T) {
 		}
 		return resp, nil
 	}
-	ReadResponseBuffer = func(res *http.Response) (*RestaurantApiResponse, error) {
+	ReadRestaurantApiResponse = func(res *http.Response) (*RestaurantApiResponse, error) {
 		return &RestaurantApiResponse{}, nil
 	}
 

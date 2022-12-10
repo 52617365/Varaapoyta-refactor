@@ -3,6 +3,7 @@ package requests
 import (
 	"bytes"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 )
@@ -22,9 +23,9 @@ var sendRequest = func(req *http.Request) (*http.Response, error) {
 }
 
 func GetRequestHandlerFor(api *Api) *http.Request {
-	if graphApi(api) {
+	if isGraphApi(api) {
 		return getGraphApiHandler(api)
-	} else if restaurantsApi(api) {
+	} else if isRestaurantsApi(api) {
 		return getRestaurantsApiHandler()
 	} else {
 		log.Fatal("[GetRequestHandlerFor] - Invalid api name")
@@ -32,7 +33,7 @@ func GetRequestHandlerFor(api *Api) *http.Request {
 	return nil
 }
 
-func graphApi(api *Api) bool {
+func isGraphApi(api *Api) bool {
 	return api.Name == "graph"
 }
 
@@ -59,7 +60,7 @@ func setGraphApiHeadersTo(r *http.Request) {
 	r.Header.Add("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
 }
 
-func restaurantsApi(api *Api) bool {
+func isRestaurantsApi(api *Api) bool {
 	return api.Name == "restaurant"
 }
 func getRestaurantsApiHandler() *http.Request {
@@ -82,4 +83,15 @@ func setRestaurantApiHeadersTo(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("client_id", "jNAWMvWD9rp637RaR")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
+}
+
+var ReadResponseBuffer = func(res *http.Response) ([]byte, error) {
+	defer res.Body.Close()
+
+	b, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		return []byte{}, err
+	}
+	return b, nil
 }
