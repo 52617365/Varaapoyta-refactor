@@ -1,11 +1,15 @@
 package requests
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestGetUrl(t *testing.T) {
 	restaurantId := 1
+	currentDate := getCurrentDate()
 	timeSlot := "0800"
-	expectedUrl := "https://s-varaukset.fi/api/recommendations/slot/1/TODO/0800/1"
+	expectedUrl := fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/0800/1", currentDate)
 	actualUrl := getUrl(restaurantId, timeSlot)
 	if actualUrl != expectedUrl {
 		t.Errorf("getUrl - Expected %s, got %s", expectedUrl, actualUrl)
@@ -14,11 +18,12 @@ func TestGetUrl(t *testing.T) {
 
 func TestGetUrls(t *testing.T) {
 	restaurantId := 1
+	currentDate := getCurrentDate()
 	expectedUrls := []string{
-		"https://s-varaukset.fi/api/recommendations/slot/1/TODO/0800/1",
-		"https://s-varaukset.fi/api/recommendations/slot/1/TODO/1200/1",
-		"https://s-varaukset.fi/api/recommendations/slot/1/TODO/1600/1",
-		"https://s-varaukset.fi/api/recommendations/slot/1/TODO/2000/1",
+		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/0800/1", currentDate),
+		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/1200/1", currentDate),
+		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/1600/1", currentDate),
+		fmt.Sprintf("https://s-varaukset.fi/api/recommendations/slot/1/%s/2000/1", currentDate),
 	}
 	actualUrls := getUrls(restaurantId)
 
