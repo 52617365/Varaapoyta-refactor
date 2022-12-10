@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetValidRestaurants(t *testing.T) {
-	GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
+	sendRequest = func(req *http.Request) (*http.Response, error) {
 		resp := &http.Response{
 			Status:     "200 OK",
 			StatusCode: 200,
@@ -24,7 +24,7 @@ func TestGetValidRestaurants(t *testing.T) {
 	}
 }
 func TestGetInvalidRestaurants(t *testing.T) {
-	GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
+	sendRequest = func(req *http.Request) (*http.Response, error) {
 		return nil, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
 	}
 

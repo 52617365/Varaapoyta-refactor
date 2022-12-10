@@ -2,6 +2,7 @@ package requests
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"net/http"
 )
@@ -9,6 +10,15 @@ import (
 type Api struct {
 	Name string
 	Url  string
+}
+
+var sendRequest = func(req *http.Request) (*http.Response, error) {
+	httpClient := &http.Client{}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, errors.New("error sending request to Raflaamo")
+	}
+	return resp, nil
 }
 
 func GetRequestHandlerFor(api *Api) *http.Request {

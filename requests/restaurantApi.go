@@ -13,7 +13,7 @@ func GetRestaurants() (*RestaurantApiResponse, error) {
 	}
 	req := GetRequestHandlerFor(api)
 
-	resp, err := GetRestaurantsFromApi(req)
+	resp, err := getRestaurantsFromApi(req)
 	if err != nil {
 		return &RestaurantApiResponse{}, err
 	}
@@ -27,13 +27,9 @@ func GetRestaurants() (*RestaurantApiResponse, error) {
 	return response, nil
 }
 
-var GetRestaurantsFromApi = func(req *http.Request) (*http.Response, error) {
-	httpClient := &http.Client{}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
-	}
-	return resp, nil
+func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
+	resp, err := sendRequest(req)
+	return resp, err
 }
 
 var ReadResponseBuffer = func(res *http.Response) (*RestaurantApiResponse, error) {
