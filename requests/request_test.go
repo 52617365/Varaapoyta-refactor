@@ -91,3 +91,20 @@ func TestSetGraphApiHeadersTo(t *testing.T) {
 		}
 	}
 }
+
+func TestSetRestaurantApiHeadersTo(t *testing.T) {
+	expectedHeaderKeys := []string{"Content-Type", "Client_id", "User-Agent"}
+	expectedHeaderValues := []string{"application/json", "jNAWMvWD9rp637RaR", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
+
+	req, _ := http.NewRequest("POST", "https://api.raflaamo.fi/query", nil)
+	setRestaurantApiHeadersTo(req)
+
+	for key, value := range req.Header {
+		if !slices.Contains(expectedHeaderKeys, key) {
+			t.Errorf("setRestaurantApiHeadersTo - header key %v not found", key)
+		}
+		if !slices.Contains(expectedHeaderValues, value[0]) {
+			t.Errorf("setRestaurantApiHeadersTo - header value %v not found", value)
+		}
+	}
+}
