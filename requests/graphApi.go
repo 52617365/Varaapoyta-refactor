@@ -5,13 +5,35 @@ import (
 	"net/http"
 )
 
-func GetGraphApiTimeSlotsFrom(requestUrl string) (*http.Response, error) {
+func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
+	requestHandler := getGraphApiRequestHandler(requestUrl)
+	response, err := sendRequestToGraphApi(requestHandler)
+	if err != nil {
+		return nil, fmt.Errorf("sendRequestToGraphApi - Error sending request to Raflaamo graph api. - %w", err)
+	}
+	responseBuffer, err := ReadResponseBuffer(response)
+	if err != nil {
+		return nil, fmt.Errorf("ReadResponseBuffer - Error reading response buffer. - %w", err)
+	}
+	deserializedResponse, err := deserializeGraphApiResponse(responseBuffer)
+	if err != nil {
+		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
+	}
+	return deserializedResponse, nil
+}
+
+func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	graphApi := Api{
 		Name: "graph",
 		Url:  requestUrl,
 	}
 	requestHandler := GetRequestHandlerFor(&graphApi)
-	response, err := sendRequestToGraphApi(requestHandler)
+	return requestHandler
+}
+
+func deserializeGraphApiResponse(responseBuffer []byte) (*GraphApiResponse, error) {
+	deserializedType := GraphApiResponse{}
+	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
 	if err != nil {
 		return &GraphApiResponse{}, nil
 	}
