@@ -2,6 +2,7 @@ package requests
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -94,4 +95,12 @@ var ReadResponseBuffer = func(res *http.Response) ([]byte, error) {
 		return []byte{}, err
 	}
 	return b, nil
+}
+
+func deserializeResponse(response []byte, responseStructure interface{}) (interface{}, error) {
+	err := json.Unmarshal(response, &responseStructure)
+	if err != nil {
+		return nil, err
+	}
+	return &responseStructure, nil
 }
