@@ -13,32 +13,32 @@ type Api struct {
 
 func GetRequestHandlerFor(api *Api) *http.Request {
 	if graphApi(api) {
-		if !graphApiUrlExists(api) {
-			log.Fatal("[GetRequestHandlerFor] - API Name was graph but url was empty.")
-		}
-		req, err := http.NewRequest("GET", api.Url, nil)
-
-		if err != nil {
-			log.Fatal("There was an error initializing the graph api handler.")
-		}
-		setGraphApiHeadersTo(req)
-		return req
+		return getGraphApiHandler(api)
 	} else if restaurantsApi(api) {
-		payload := getRestaurantsApiPayload()
-		req, err := http.NewRequest("POST", "https://api.raflaamo.fi/query", bytes.NewBuffer(payload))
-		if err != nil {
-			log.Fatalln("Unexpected error when we constructed the restaurant api handler.")
-		}
-		setRestaurantApiHeadersTo(req)
-		return req
+		return getRestaurantsApiHandler()
 	} else {
 		log.Fatal("[GetRequestHandlerFor] - Invalid api name")
 	}
 	return nil
 }
+
 func graphApi(api *Api) bool {
 	return api.Name == "graph"
 }
+
+func getGraphApiHandler(api *Api) *http.Request {
+	if !graphApiUrlExists(api) {
+		log.Fatal("[GetRequestHandlerFor] - API Name was graph but url was empty.")
+	}
+	req, err := http.NewRequest("GET", api.Url, nil)
+
+	if err != nil {
+		log.Fatal("There was an error initializing the graph api handler.")
+	}
+	setGraphApiHeadersTo(req)
+	return req
+}
+
 func graphApiUrlExists(api *Api) bool {
 	if api.Url == "" {
 		return false
@@ -51,6 +51,15 @@ func setGraphApiHeadersTo(r *http.Request) {
 
 func restaurantsApi(api *Api) bool {
 	return api.Name == "restaurant"
+}
+func getRestaurantsApiHandler() *http.Request {
+	payload := getRestaurantsApiPayload()
+	req, err := http.NewRequest("POST", "https://api.raflaamo.fi/query", bytes.NewBuffer(payload))
+	if err != nil {
+		log.Fatalln("Unexpected error when we constructed the restaurant api handler.")
+	}
+	setRestaurantApiHeadersTo(req)
+	return req
 }
 
 func getRestaurantsApiPayload() []byte {
