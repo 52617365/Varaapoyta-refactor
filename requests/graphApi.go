@@ -3,6 +3,8 @@ package requests
 import (
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 )
 
 var timeSlots = [...]string{"0800", "1200", "1600", "2000"}
@@ -20,11 +22,16 @@ func getUrls(restaurantId int) []string {
 	return urls
 }
 func getUrl(restaurantId int, timeSlot string) string {
-	// TODO: get current date inside of this function instead of passing it in.
-	currentDate := "TODO" // E.g. 2022-08-12
+	currentDate := getCurrentDate()
 
 	url := fmt.Sprintf(`https://s-varaukset.fi/api/recommendations/slot/%d/%s/%s/1`, restaurantId, currentDate, timeSlot)
 	return url
+}
+func getCurrentDate() string {
+	current := time.Now().String()
+	indexOfSpace := strings.Index(current, " ")
+	dateFromCurrent := current[:indexOfSpace]
+	return dateFromCurrent
 }
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
 	requestHandler := getGraphApiRequestHandler(requestUrl)
