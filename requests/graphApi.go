@@ -6,6 +6,7 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
+// GetGraphApiTimeSlotsFrom TODO: extract the times from the response into an array of time intervals.
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
@@ -31,6 +32,11 @@ func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
 	return responseBuffer, nil
 }
 
+var sendRequestToGraphApi = func(requestHandler *http.Request) (*http.Response, error) {
+	response, err := sendRequest(requestHandler)
+	return response, err
+}
+
 func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	graphApi := Api{
 		Name: "graph",
@@ -39,7 +45,6 @@ func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	requestHandler := GetRequestHandlerFor(&graphApi)
 	return requestHandler
 }
-
 func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.GraphApiResponse, error) {
 	deserializedType := responseStructures.GraphApiResponse{}
 	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
@@ -48,9 +53,4 @@ func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.Gra
 	}
 	result := deserializedResponse.(*responseStructures.GraphApiResponse)
 	return result, nil
-}
-
-func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error) {
-	response, err := sendRequest(requestHandler)
-	return response, err
 }
