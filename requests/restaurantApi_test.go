@@ -74,3 +74,21 @@ func TestReservationPageExistsFalse2(t *testing.T) {
 		t.Errorf("reservationPageExists - expected false, got %t", actual)
 	}
 }
+
+func TestSetReservationPageIds(t *testing.T) {
+	apiResponse := `{"data": {"listRestaurantsByLocation": {"totalCount": 467,"edges": [{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}]}}}`
+
+	response := []byte(apiResponse)
+	restaurants, _ := deserializeRestaurantApiResponse(response)
+	setReservationIdsToRestaurants(restaurants)
+
+	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
+		restaurantResUrl := restaurant.Links.TableReservationLocalized.FiFI
+		id, _ := getReservationIdFrom(restaurantResUrl)
+		setId := restaurant.ReservationPageID
+
+		if id != setId {
+			t.Errorf("setReservationIdsToRestaurants - expected %s, got %s", id, setId)
+		}
+	}
+}
