@@ -62,15 +62,16 @@ var RegexToMatchRestaurantId = regexp.MustCompile(`fi/(\d+)`)
 // setReservationIdsToRestaurants the id returned from the endpoint is not the same as the one in the reservation page url.
 // we need the latter to access the graph api.
 func setReservationIdsToRestaurants(restaurants *responseStructures.RestaurantApiResponse) {
-	for index, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
-		reservationPageUrl := restaurant.Links.TableReservationLocalized.FiFI
+	data := restaurants.Data.ListRestaurantsByLocation.Edges
+	for index := range data {
+		reservationPageUrl := data[index].Links.TableReservationLocalized.FiFI
 		if reservationPageExists(reservationPageUrl) {
 			restaurantId, err := getReservationIdFrom(reservationPageUrl)
 			if err != nil {
 				// TODO: this should be logged because it should not have a problem finding the id after the check.
 				continue
 			}
-			restaurants.Data.ListRestaurantsByLocation.Edges[index].ReservationPageID = restaurantId
+			data[index].ReservationPageID = restaurantId
 		}
 	}
 }
