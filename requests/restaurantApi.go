@@ -26,6 +26,7 @@ func GetRestaurants() (*responseStructures.RestaurantApiResponse, error) {
 	if err != nil {
 		return &responseStructures.RestaurantApiResponse{}, err
 	}
+	//filterValidRestaurants(response, "Helsinki")
 	setReservationIdsToRestaurants(response)
 	return response, nil
 }
@@ -63,7 +64,7 @@ func setReservationIdsToRestaurants(restaurants *responseStructures.RestaurantAp
 	data := restaurants.Data.ListRestaurantsByLocation.Edges
 	for index := range data {
 		reservationPageUrl := data[index].Links.TableReservationLocalized.FiFI
-		if reservationPageExists(reservationPageUrl) {
+		if reservationPageExists(reservationPageUrl) { // TODO: we don't have to do this check here if we filter them beforehand.
 			restaurantId, err := getReservationIdFrom(reservationPageUrl)
 			if err != nil {
 				// TODO: this should be logged because it should not have a problem finding the id after the check.
@@ -84,6 +85,12 @@ func getReservationIdFrom(reservationPageUrl string) (string, error) {
 	restaurantId := restaurantIdMatch[0][1]
 	return restaurantId, nil
 }
+
+// func filterValidRestaurants(restaurants *responseStructures.RestaurantApiResponse, city string) {
+// TODO: call this function before setting the reservation ids.
+// TODO: check that the restaurant is in the city provided
+// TODO: check that the restaurant has a reservation page url
+// }
 func reservationPageExists(reservationPageUrl string) bool {
 	if reservationPageUrl == "" {
 		return false
