@@ -32,11 +32,6 @@ func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
 	return responseBuffer, nil
 }
 
-var sendRequestToGraphApi = func(requestHandler *http.Request) (*http.Response, error) {
-	response, err := sendRequest(requestHandler)
-	return response, err
-}
-
 func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	graphApi := Api{
 		Name: "graph",
@@ -45,6 +40,12 @@ func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	requestHandler := GetRequestHandlerFor(&graphApi)
 	return requestHandler
 }
+
+var sendRequestToGraphApi = func(requestHandler *http.Request) (*http.Response, error) {
+	response, err := sendRequest(requestHandler)
+	return response, err
+}
+
 func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.GraphApiResponse, error) {
 	deserializedType := responseStructures.GraphApiResponse{}
 	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)

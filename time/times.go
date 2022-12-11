@@ -1,6 +1,8 @@
 package time
 
-import "time"
+import (
+	"time"
+)
 
 func GetSlotsFromTheFuture() []int {
 	var GraphSlotHoursForTheDay = [...]int{2, 8, 14, 20}
@@ -30,4 +32,17 @@ func convertUnixToTime(unix int64) time.Time {
 
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {
 	return endTime.Sub(startTime)
+}
+
+func spawnUnixTimeIntervals() []int64 {
+	currentTime := time.Now()
+
+	timeIntervals := make([]int64, 0, 96)
+	for i := 0; i < 24; i++ {
+		timeIntervals = append(timeIntervals, time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 0, 0, 0, time.UTC).UnixMilli())
+		timeIntervals = append(timeIntervals, time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 15, 0, 0, time.UTC).UnixMilli())
+		timeIntervals = append(timeIntervals, time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 30, 0, 0, time.UTC).UnixMilli())
+		timeIntervals = append(timeIntervals, time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 45, 0, 0, time.UTC).UnixMilli())
+	}
+	return timeIntervals
 }

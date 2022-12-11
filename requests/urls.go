@@ -6,7 +6,7 @@ import (
 	"varaapoyta-backend-refactor/time"
 )
 
-func getUrls(restaurantId int) []string {
+func GetUrls(restaurantId string) []string {
 	var urls []string
 	for _, timeSlot := range time.GetSlotsFromTheFuture() {
 		url := getUrl(restaurantId, timeSlot)
@@ -14,11 +14,11 @@ func getUrls(restaurantId int) []string {
 	}
 	return urls
 }
-func getUrl(restaurantId int, timeSlot int) string {
+func getUrl(restaurantId string, timeSlot int) string {
 	currentDate := date.GetCurrentDate()
 	formattedTimeSlot := formatTimeSlotFrom(timeSlot)
 
-	url := fmt.Sprintf(`https://s-varaukset.fi/api/recommendations/slot/%d/%s/%s/1`, restaurantId, currentDate, formattedTimeSlot)
+	url := fmt.Sprintf(`https://s-varaukset.fi/api/recommendations/slot/%s/%s/%s/1`, restaurantId, currentDate, formattedTimeSlot)
 	return url
 }
 

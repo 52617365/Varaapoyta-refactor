@@ -48,3 +48,10 @@ func TestGetTimeDifferenceBetweenTwoTimes(t *testing.T) {
 		t.Errorf("expected %d, got %d", expectedTimeDifference, actualTimeDifference)
 	}
 }
+
+func TestSpawnUnixTimeIntervals(t *testing.T) {
+	actualUnixTimeIntervals := spawnUnixTimeIntervals()
+	if len(actualUnixTimeIntervals) != 96 {
+		t.Errorf("expected %d, got %d", 96, len(actualUnixTimeIntervals))
+	}
+}
