@@ -38,3 +38,13 @@ func TestConvertUnixToTime(t *testing.T) {
 		t.Errorf("expected %d, got %d", expectedTime.Year(), actualTime.Year())
 	}
 }
+
+func TestGetTimeDifferenceBetweenTwoTimes(t *testing.T) {
+	startTime := time.Date(2021, time.July, 8, 0, 0, 0, 0, time.UTC)
+	endTime := time.Date(2021, time.July, 8, 1, 0, 0, 0, time.UTC)
+	actualTimeDifference := getTimeDifferenceBetweenTwoTimes(startTime, endTime)
+	expectedTimeDifference := time.Hour
+	if actualTimeDifference != expectedTimeDifference {
+		t.Errorf("expected %d, got %d", expectedTimeDifference, actualTimeDifference)
+	}
+}
