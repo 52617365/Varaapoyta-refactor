@@ -5,8 +5,9 @@ type RestaurantApiResponse struct {
 		ListRestaurantsByLocation struct {
 			TotalCount int `json:"totalCount"`
 			Edges      []struct {
-				ID   string `json:"id"`
-				Name struct {
+				ID                string `json:"id"`
+				ReservationPageID string `json:"-"`
+				Name              struct {
 					FiFI string `json:"fi_FI"`
 				} `json:"name"`
 				URLPath struct {
