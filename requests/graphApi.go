@@ -5,11 +5,6 @@ import (
 	"net/http"
 )
 
-//func GetGraphApiTimeSlotsFor(restaurantId int) []string {
-//	urls := getUrls(restaurantId)
-//
-//}
-
 func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
