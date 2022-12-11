@@ -34,3 +34,43 @@ func TestGetInvalidRestaurants(t *testing.T) {
 		t.Errorf("GetRestaurants - Did not throw an error when we expected it to.")
 	}
 }
+
+func TestGetReservationPageIdFrom(t *testing.T) {
+	urlToMatch := "https://s-varaukset.fi/online/reservation/fi/72?_ga=2.161416895.382807502.1612853101-189045693.1611044564"
+	expected := "72"
+	actual, err := getReservationIdFrom(urlToMatch)
+	if err != nil {
+		t.Errorf("getReservationIdFrom - Threw an unexpected error.")
+	}
+	if actual != expected {
+		t.Errorf("getReservationPageIdFrom - expected %s, got %s", expected, actual)
+	}
+}
+func TestErrorGetReservationPageIdFrom(t *testing.T) {
+	urlToMatch := "https://s-varaukset.fi/"
+	actual, err := getReservationIdFrom(urlToMatch)
+	if err == nil {
+		t.Errorf("getReservationIdFrom - expected error, got %s", actual)
+	}
+}
+func TestReservationPageExistsTrue(t *testing.T) {
+	urlToMatch := "https://s-varaukset.fi/online/reservation/fi/72?_ga=2.161416895.382807502.1612853101-189045693.1611044564"
+	actual := reservationPageExists(urlToMatch)
+	if !actual {
+		t.Errorf("reservationPageExists - expected true, got %t", actual)
+	}
+}
+func TestReservationPageExistsFalse(t *testing.T) {
+	urlToMatch := ""
+	actual := reservationPageExists(urlToMatch)
+	if actual {
+		t.Errorf("reservationPageExists - expected false, got %t", actual)
+	}
+}
+func TestReservationPageExistsFalse2(t *testing.T) {
+	urlToMatch := "randomlink.com"
+	actual := reservationPageExists(urlToMatch)
+	if actual {
+		t.Errorf("reservationPageExists - expected false, got %t", actual)
+	}
+}
