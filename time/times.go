@@ -23,3 +23,7 @@ func GetCurrentHour() int {
 func slotIsInFuture(slot int, currentHour int) bool {
 	return slot >= currentHour
 }
+
+func convertUnixToTime(unix int64) time.Time {
+	return time.UnixMilli(unix)
+}

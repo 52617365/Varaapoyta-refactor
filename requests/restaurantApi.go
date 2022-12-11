@@ -57,8 +57,6 @@ func deserializeRestaurantApiResponse(response []byte) (*responseStructures.Rest
 	return result, nil
 }
 
-var RegexToMatchRestaurantId = regexp.MustCompile(`fi/(\d+)`)
-
 // setReservationIdsToRestaurants the id returned from the endpoint is not the same as the one in the reservation page url.
 // we need the latter to access the graph api.
 func setReservationIdsToRestaurants(restaurants *responseStructures.RestaurantApiResponse) {
@@ -75,6 +73,8 @@ func setReservationIdsToRestaurants(restaurants *responseStructures.RestaurantAp
 		}
 	}
 }
+
+var RegexToMatchRestaurantId = regexp.MustCompile(`fi/(\d+)`)
 
 func getReservationIdFrom(reservationPageUrl string) (string, error) {
 	restaurantIdMatch := RegexToMatchRestaurantId.FindAllStringSubmatch(reservationPageUrl, -1)
