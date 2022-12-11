@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
 type Api struct {
@@ -101,11 +102,11 @@ func deserializeResponse(response []byte, responseStructure interface{}) (interf
 	var typeOfStructure interface{}
 
 	switch responseStructure.(type) {
-	case GraphApiResponse:
-		typeOfStructure = &GraphApiResponse{}
+	case responseStructures.GraphApiResponse:
+		typeOfStructure = &responseStructures.GraphApiResponse{}
 		break
-	case RestaurantApiResponse:
-		typeOfStructure = &RestaurantApiResponse{}
+	case responseStructures.RestaurantApiResponse:
+		typeOfStructure = &responseStructures.RestaurantApiResponse{}
 		break
 	default:
 		log.Fatal("Invalid response structure")

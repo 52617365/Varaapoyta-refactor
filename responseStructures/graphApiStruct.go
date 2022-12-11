@@ -1,4 +1,4 @@
-package requests
+package responseStructures
 
 type GraphApiResponse []struct {
 	Name      string `json:"name"`

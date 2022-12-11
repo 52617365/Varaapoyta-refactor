@@ -1,4 +1,4 @@
-package requests
+package responseStructures
 
 type RestaurantApiResponse struct {
 	Data struct {

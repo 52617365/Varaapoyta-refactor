@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
 func TestGetValidRestaurants(t *testing.T) {
@@ -14,8 +15,8 @@ func TestGetValidRestaurants(t *testing.T) {
 		}
 		return resp, nil
 	}
-	ReadRestaurantApiResponse = func(res *http.Response) (*RestaurantApiResponse, error) {
-		return &RestaurantApiResponse{}, nil
+	ReadRestaurantApiResponse = func(res *http.Response) (*responseStructures.RestaurantApiResponse, error) {
+		return &responseStructures.RestaurantApiResponse{}, nil
 	}
 
 	_, err := GetRestaurants()

@@ -3,9 +3,10 @@ package requests
 import (
 	"fmt"
 	"net/http"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
-func GetGraphApiTimeSlotsFrom(requestUrl string) (*GraphApiResponse, error) {
+func GetGraphApiTimeSlotsFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return nil, err
@@ -39,13 +40,13 @@ func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	return requestHandler
 }
 
-func deserializeGraphApiResponse(responseBuffer []byte) (*GraphApiResponse, error) {
-	deserializedType := GraphApiResponse{}
+func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.GraphApiResponse, error) {
+	deserializedType := responseStructures.GraphApiResponse{}
 	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
 	if err != nil {
-		return &GraphApiResponse{}, nil
+		return &responseStructures.GraphApiResponse{}, nil
 	}
-	result := deserializedResponse.(*GraphApiResponse)
+	result := deserializedResponse.(*responseStructures.GraphApiResponse)
 	return result, nil
 }
 

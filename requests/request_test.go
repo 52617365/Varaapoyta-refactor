@@ -4,6 +4,7 @@ import (
 	"golang.org/x/exp/slices"
 	"net/http"
 	"testing"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
 func TestGetRestaurantRequestHandler(t *testing.T) {
@@ -113,7 +114,7 @@ func TestDeserializeRestaurantApiResponse(t *testing.T) {
 	response := `{"data": {"listRestaurantsByLocation": {"totalCount": 470}}}`
 	expectedTotalCount := 470
 
-	responseStruct := RestaurantApiResponse{}
+	responseStruct := responseStructures.RestaurantApiResponse{}
 
 	bytes := []byte(response)
 	restaurant, err := deserializeResponse(bytes, responseStruct)
@@ -121,7 +122,7 @@ func TestDeserializeRestaurantApiResponse(t *testing.T) {
 		t.Errorf("TestDeserializeRestaurantApiResponse - expected no error, got %v", err)
 	}
 
-	restaurantWithType, ok := restaurant.(*RestaurantApiResponse)
+	restaurantWithType, ok := restaurant.(*responseStructures.RestaurantApiResponse)
 	if !ok {
 		t.Errorf("TestDeserializeRestaurantApiResponse - expected restaurant to be of type RestaurantApiResponse, got %T", restaurant)
 	}
@@ -134,7 +135,7 @@ func TestDeserializeGraphApiResponse(t *testing.T) {
 	response := `[{"name": "Stone's", "intervals": [{"from": 1660322700000,"to": 1660322700000,"color": "transparent"}]}]`
 	expectedName := "Stone's"
 
-	responseStruct := GraphApiResponse{}
+	responseStruct := responseStructures.GraphApiResponse{}
 
 	bytes := []byte(response)
 	restaurant, err := deserializeResponse(bytes, responseStruct)
@@ -142,7 +143,7 @@ func TestDeserializeGraphApiResponse(t *testing.T) {
 		t.Errorf("TestDeserializeGraphApiResponse - expected no error, got %v", err)
 	}
 
-	restaurantWithType, ok := restaurant.(*GraphApiResponse)
+	restaurantWithType, ok := restaurant.(*responseStructures.GraphApiResponse)
 	if !ok {
 		t.Errorf("TestDeserializeGraphApiResponse - expected restaurant to be of type GraphApiResponse, got %T", restaurant)
 	}

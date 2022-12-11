@@ -3,9 +3,10 @@ package requests
 import (
 	"errors"
 	"net/http"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
-func GetRestaurants() (*RestaurantApiResponse, error) {
+func GetRestaurants() (*responseStructures.RestaurantApiResponse, error) {
 	api := &Api{
 		Name: "restaurant",
 	}
@@ -13,15 +14,15 @@ func GetRestaurants() (*RestaurantApiResponse, error) {
 
 	resp, err := getRestaurantsFromApi(req)
 	if err != nil {
-		return &RestaurantApiResponse{}, err
+		return &responseStructures.RestaurantApiResponse{}, err
 	}
 	if resp.StatusCode != 200 {
-		return &RestaurantApiResponse{}, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
+		return &responseStructures.RestaurantApiResponse{}, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
 	}
 	response, err := ReadRestaurantApiResponse(resp)
 
 	if err != nil {
-		return &RestaurantApiResponse{}, err
+		return &responseStructures.RestaurantApiResponse{}, err
 	}
 	return response, nil
 }
@@ -31,24 +32,24 @@ func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-var ReadRestaurantApiResponse = func(res *http.Response) (*RestaurantApiResponse, error) {
+var ReadRestaurantApiResponse = func(res *http.Response) (*responseStructures.RestaurantApiResponse, error) {
 	readBuffer, err := ReadResponseBuffer(res)
 	if err != nil {
-		return &RestaurantApiResponse{}, err
+		return &responseStructures.RestaurantApiResponse{}, err
 	}
 	deserializedResponse, err := deserializeRestaurantApiResponse(readBuffer)
 	if err != nil {
-		return &RestaurantApiResponse{}, err
+		return &responseStructures.RestaurantApiResponse{}, err
 	}
 	return deserializedResponse, nil
 }
 
-func deserializeRestaurantApiResponse(response []byte) (*RestaurantApiResponse, error) {
-	responseStructure := RestaurantApiResponse{}
+func deserializeRestaurantApiResponse(response []byte) (*responseStructures.RestaurantApiResponse, error) {
+	responseStructure := responseStructures.RestaurantApiResponse{}
 	deserializedResponse, err := deserializeResponse(response, &responseStructure)
 	if err != nil {
 		return nil, err
 	}
-	result := deserializedResponse.(*RestaurantApiResponse)
+	result := deserializedResponse.(*responseStructures.RestaurantApiResponse)
 	return result, nil
 }
