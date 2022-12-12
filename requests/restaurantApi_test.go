@@ -97,7 +97,7 @@ func TestSetReservationPageIds(t *testing.T) {
 
 	response := []byte(apiResponse)
 	restaurants, _ := deserializeRestaurantApiResponse(response)
-	setReservationIdsToRestaurants(restaurants)
+	setReservationIdsToRestaurants(restaurants.Data.ListRestaurantsByLocation.Edges)
 
 	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
 		restaurantResUrl := restaurant.Links.TableReservationLocalized.FiFI
