@@ -19,16 +19,15 @@ func GetRestaurants() (*responseStructures.RestaurantApiResponse, error) {
 		return &responseStructures.RestaurantApiResponse{}, err
 	}
 	if resp.StatusCode != 200 {
-		return &responseStructures.RestaurantApiResponse{}, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
+		return &responseStructures.RestaurantApiResponse{}, errors.New("GetRestaurants - could not get restaurants from api.raflaamo.fi/query")
 	}
-	response, err := ReadRestaurantApiResponse(resp)
+	restaurants, err := ReadRestaurantApiResponse(resp)
 
 	if err != nil {
 		return &responseStructures.RestaurantApiResponse{}, err
 	}
-	//filterValidRestaurants(response, "Helsinki")
-	setReservationIdsToRestaurants(response)
-	return response, nil
+	filterRestaurants(restaurants)
+	return restaurants, nil
 }
 
 func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
@@ -58,20 +57,33 @@ func deserializeRestaurantApiResponse(response []byte) (*responseStructures.Rest
 	return result, nil
 }
 
+func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) {
+	filterValidRestaurants(restaurants)
+	setReservationIdsToRestaurants(restaurants)
+}
+
+func filterValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
+	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges))
+	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
+		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) { // TODO: add city into the filtering later.
+			validRestaurants = append(validRestaurants, restaurant)
+		}
+	}
+	return validRestaurants
+}
+
 // setReservationIdsToRestaurants the id returned from the endpoint is not the same as the one in the reservation page url.
 // we need the latter to access the graph api.
 func setReservationIdsToRestaurants(restaurants *responseStructures.RestaurantApiResponse) {
 	data := restaurants.Data.ListRestaurantsByLocation.Edges
 	for index := range data {
 		reservationPageUrl := data[index].Links.TableReservationLocalized.FiFI
-		if reservationPageExists(reservationPageUrl) { // TODO: we don't have to do this check here if we filter them beforehand.
-			restaurantId, err := getReservationIdFrom(reservationPageUrl)
-			if err != nil {
-				// TODO: this should be logged because it should not have a problem finding the id after the check.
-				continue
-			}
-			data[index].ReservationPageID = restaurantId
+		restaurantId, err := getReservationIdFrom(reservationPageUrl)
+		if err != nil {
+			// TODO: this should be logged because it should not have a problem finding the id after the check.
+			continue
 		}
+		data[index].ReservationPageID = restaurantId
 	}
 }
 
@@ -86,11 +98,6 @@ func getReservationIdFrom(reservationPageUrl string) (string, error) {
 	return restaurantId, nil
 }
 
-// func filterValidRestaurants(restaurants *responseStructures.RestaurantApiResponse, city string) {
-// TODO: call this function before setting the reservation ids.
-// TODO: check that the restaurant is in the city provided
-// TODO: check that the restaurant has a reservation page url
-// }
 func reservationPageExists(reservationPageUrl string) bool {
 	if reservationPageUrl == "" {
 		return false
