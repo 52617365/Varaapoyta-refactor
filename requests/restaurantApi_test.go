@@ -109,3 +109,22 @@ func TestSetReservationPageIds(t *testing.T) {
 		}
 	}
 }
+
+func TestFilterValidRestaurants(t *testing.T) {
+	apiResponse := `{"data": {"listRestaurantsByLocation": {"totalCount": 467,"edges": [
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}
+	]}}}`
+	response := []byte(apiResponse)
+	restaurants, _ := deserializeRestaurantApiResponse(response)
+	validRestaurants := filterValidRestaurants(restaurants)
+
+	for _, validRestaurant := range validRestaurants {
+		if validRestaurant.Links.TableReservationLocalized.FiFI == "" {
+			t.Errorf("filterValidRestaurants - expected a valid restaurant reservation page url, got %s", validRestaurant.Links.TableReservationLocalized.FiFI)
+		}
+	}
+	if len(validRestaurants) != 1 {
+		t.Errorf("filterValidRestaurants - expected len to be 1, got %d", len(validRestaurants))
+	}
+}
