@@ -51,7 +51,7 @@ func getUnixStampsInBetweenTimesAsString(from int64, to int64) []string {
 	unixStampsInbetweenTimes := getUnixStampsInbetweenTimes(from, to)
 	var unixStampsInbetweenTimesAsString []string
 	for _, unixStamp := range unixStampsInbetweenTimes {
-		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToTime(unixStamp).Format("15:04"))
+		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToTime(unixStamp).Format("1504"))
 	}
 	return unixStampsInbetweenTimesAsString
 }

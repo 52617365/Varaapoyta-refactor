@@ -83,7 +83,7 @@ func TestGetUnixStampsInBetweenTimesAsString(t *testing.T) {
 
 	actualUnixStampsInbetweenTimes := getUnixStampsInBetweenTimesAsString(from, to)
 
-	expectedTimes := []string{"11:00", "11:30", "12:00"}
+	expectedTimes := []string{"1100", "1130", "1200"}
 
 	for _, time := range actualUnixStampsInbetweenTimes {
 		if !slices.Contains(expectedTimes, time) {
