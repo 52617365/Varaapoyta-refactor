@@ -8,7 +8,7 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
-func GetRestaurants() (*responseStructures.RestaurantApiResponse, error) {
+func GetRestaurants() ([]responseStructures.Edges, error) {
 	api := &Api{
 		Name: "restaurant",
 	}
@@ -16,18 +16,18 @@ func GetRestaurants() (*responseStructures.RestaurantApiResponse, error) {
 
 	resp, err := getRestaurantsFromApi(req)
 	if err != nil {
-		return &responseStructures.RestaurantApiResponse{}, err
+		return nil, err
 	}
 	if resp.StatusCode != 200 {
-		return &responseStructures.RestaurantApiResponse{}, errors.New("GetRestaurants - could not get restaurants from api.raflaamo.fi/query")
+		return nil, errors.New("GetRestaurants - could not get restaurants from api.raflaamo.fi/query")
 	}
 	restaurants, err := ReadRestaurantApiResponse(resp)
 
 	if err != nil {
-		return &responseStructures.RestaurantApiResponse{}, err
+		return nil, err
 	}
-	filterRestaurants(restaurants)
-	return restaurants, nil
+	validRestaurants := filterRestaurants(restaurants)
+	return validRestaurants, nil
 }
 
 func getRestaurantsFromApi(req *http.Request) (*http.Response, error) {
@@ -57,9 +57,10 @@ func deserializeRestaurantApiResponse(response []byte) (*responseStructures.Rest
 	return result, nil
 }
 
-func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) {
+func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
 	validRestaurants := filterValidRestaurants(restaurants)
 	setReservationIdsToRestaurants(validRestaurants)
+	return validRestaurants
 }
 
 func filterValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {

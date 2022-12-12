@@ -13,7 +13,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
+	for _, restaurant := range restaurants {
 		restaurantId := restaurant.ReservationPageID
 		urls := requests.GetUrls(restaurantId)
 		for _, url := range urls {
