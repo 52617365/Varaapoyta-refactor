@@ -22,15 +22,15 @@ func TestGetUrl(t *testing.T) {
 func TestGetUrls(t *testing.T) {
 	restaurantId := "1"
 	expectedUrls := getExpectedUrls()
-	actualUrls := GetUrls(restaurantId)
+	actualUrls := GetGraphApiUrls(restaurantId)
 
 	if len(actualUrls) != len(expectedUrls) {
-		t.Errorf("GetUrls - Expected %d urls, got %d", len(expectedUrls), len(actualUrls))
+		t.Errorf("GetGraphApiUrls - Expected %d urls, got %d", len(expectedUrls), len(actualUrls))
 	}
 
 	for _, expectedUrl := range expectedUrls {
 		if !slices.Contains(actualUrls, expectedUrl) {
-			t.Errorf("GetUrls - Expected returned urls to contain %s but it did not", expectedUrl)
+			t.Errorf("GetGraphApiUrls - Expected returned urls to contain %s but it did not", expectedUrl)
 		}
 	}
 }
