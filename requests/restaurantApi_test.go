@@ -117,15 +117,15 @@ func TestFilterValidRestaurants(t *testing.T) {
 	]}}}`
 	response := []byte(apiResponse)
 	restaurants, _ := deserializeRestaurantApiResponse(response)
-	validRestaurants := filterValidRestaurants(restaurants)
+	validRestaurants := getValidRestaurants(restaurants)
 
 	for _, validRestaurant := range validRestaurants {
 		if validRestaurant.Links.TableReservationLocalized.FiFI == "" {
-			t.Errorf("filterValidRestaurants - expected a valid restaurant reservation page url, got %s", validRestaurant.Links.TableReservationLocalized.FiFI)
+			t.Errorf("getValidRestaurants - expected a valid restaurant reservation page url, got %s", validRestaurant.Links.TableReservationLocalized.FiFI)
 		}
 	}
 	if len(validRestaurants) != 1 {
-		t.Errorf("filterValidRestaurants - expected len to be 1, got %d", len(validRestaurants))
+		t.Errorf("getValidRestaurants - expected len to be 1, got %d", len(validRestaurants))
 	}
 }
 

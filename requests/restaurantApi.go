@@ -58,12 +58,12 @@ func deserializeRestaurantApiResponse(response []byte) (*responseStructures.Rest
 }
 
 func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
-	validRestaurants := filterValidRestaurants(restaurants)
+	validRestaurants := getValidRestaurants(restaurants)
 	setReservationIdsToRestaurants(validRestaurants)
 	return validRestaurants
 }
 
-func filterValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
+func getValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
 	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges))
 	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
 		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) { // TODO: add city into the filtering later.
