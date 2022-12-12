@@ -20,14 +20,14 @@ import (
 //		}
 //		return timeSlots, nil
 //	}
-func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) { // this will be returning a string slice later on.
+func GetTimeSlotFrom(requestUrl string) (responseStructures.RelevantIndex, error) { // this will be returning a string slice later on.
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
-		return nil, err
+		return responseStructures.RelevantIndex{}, err
 	}
 	deserializedResponse, err := deserializeGraphApiResponse(response)
 	if err != nil {
-		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
+		return responseStructures.RelevantIndex{}, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
 	}
 	// TODO: here we want to extract the 15-minute time intervals in between from and to and ignore duplicates
 	return deserializedResponse, nil
@@ -60,12 +60,12 @@ var sendRequestToGraphApi = func(requestHandler *http.Request) (*http.Response, 
 	return response, err
 }
 
-func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.GraphApiResponse, error) {
+func deserializeGraphApiResponse(responseBuffer []byte) (responseStructures.RelevantIndex, error) {
 	deserializedType := responseStructures.GraphApiResponse{}
 	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
 	if err != nil {
-		return &responseStructures.GraphApiResponse{}, nil
+		return responseStructures.RelevantIndex{}, err
 	}
 	result := deserializedResponse.(*responseStructures.GraphApiResponse)
-	return result, nil
+	return (*result)[0], nil
 }
