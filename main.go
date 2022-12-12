@@ -17,7 +17,7 @@ func main() {
 		restaurantId := restaurant.ReservationPageID
 		urls := requests.GetGraphApiUrls(restaurantId)
 		for _, url := range urls {
-			timeSlots, err := requests.GetGraphApiTimeSlotsFrom(url)
+			timeSlots, err := requests.GetTimeSlotFrom(url)
 			if err != nil {
 				panic(err)
 			}

@@ -6,8 +6,19 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
-// GetGraphApiTimeSlotsFrom TODO: extract the times from the response into an array of time intervals.
-func GetGraphApiTimeSlotsFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) {
+func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
+	urls := GetGraphApiUrls(restaurantId)
+	var timeSlots []string
+	for _, url := range urls {
+		response, err := GetTimeSlotFrom(url)
+		if err != nil {
+			return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
+		}
+		timeSlots = append(timeSlots, response.TimeSlot)
+	}
+	return timeSlots, nil
+}
+func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return nil, err
