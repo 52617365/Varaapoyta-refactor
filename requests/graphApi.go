@@ -6,19 +6,21 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
-func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
-	urls := GetGraphApiUrls(restaurantId)
-	var timeSlots []string
-	for _, url := range urls {
-		response, err := GetTimeSlotFrom(url)
-		if err != nil {
-			return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
-		}
-		timeSlots = append(timeSlots, response.TimeSlot)
-	}
-	return timeSlots, nil
-}
-func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) {
+//	func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
+//		urls := GetGraphApiUrls(restaurantId)
+//		var timeSlots []string
+//		for _, url := range urls {
+//			//response, err := GetTimeSlotFrom(url)
+//			//if err != nil {
+//			//	return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
+//			//}
+//			// TODO: we will probably iterate the time slots here and append to the timeSlots slice ignoring duplicates.
+//			futureTimeSlot := []string{}
+//			timeSlots = append(timeSlots, futureTimeSlot...)
+//		}
+//		return timeSlots, nil
+//	}
+func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, error) { // this will be returning a string slice later on.
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return nil, err
@@ -27,6 +29,7 @@ func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, e
 	if err != nil {
 		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
 	}
+	// TODO: here we want to extract the 15 minute time intervals in between from and to and ignore duplicates
 	return deserializedResponse, nil
 }
 

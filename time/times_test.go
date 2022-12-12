@@ -55,3 +55,20 @@ func TestSpawnUnixTimeIntervals(t *testing.T) {
 		t.Errorf("expected %d, got %d", 96, len(actualUnixTimeIntervals))
 	}
 }
+
+func TestGetUnixStampsInbetweenTimes(t *testing.T) {
+	spawnUnixTimeIntervals = func() []int64 {
+		return []int64{1625743000000, 1625744000001, 1625744000002, 1625744000003}
+	}
+	from := int64(1625744000000)
+	to := int64(1625747600000)
+	actualUnixStampsInbetweenTimes := getUnixStampsInbetweenTimes(from, to)
+	for _, time := range actualUnixStampsInbetweenTimes {
+		if time < from || time > to {
+			t.Errorf("time %d is not inbetween %d and %d", time, from, to)
+		}
+	}
+	if len(actualUnixStampsInbetweenTimes) != 3 {
+		t.Errorf("expected %d, got %d", 3, len(actualUnixStampsInbetweenTimes))
+	}
+}

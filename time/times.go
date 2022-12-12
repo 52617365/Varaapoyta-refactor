@@ -34,7 +34,7 @@ func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) ti
 	return endTime.Sub(startTime)
 }
 
-func spawnUnixTimeIntervals() []int64 {
+var spawnUnixTimeIntervals = func() []int64 {
 	currentTime := time.Now()
 
 	timeIntervals := make([]int64, 0, 96)
@@ -45,4 +45,15 @@ func spawnUnixTimeIntervals() []int64 {
 		timeIntervals = append(timeIntervals, time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), i, 45, 0, 0, time.UTC).UnixMilli())
 	}
 	return timeIntervals
+}
+
+func getUnixStampsInbetweenTimes(from int64, to int64) []int64 {
+	timeIntervals := spawnUnixTimeIntervals()
+	var unixStampsInbetweenTimes []int64
+	for _, unixStamp := range timeIntervals {
+		if unixStamp >= from && unixStamp <= to {
+			unixStampsInbetweenTimes = append(unixStampsInbetweenTimes, unixStamp)
+		}
+	}
+	return unixStampsInbetweenTimes
 }
