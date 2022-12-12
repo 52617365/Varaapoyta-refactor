@@ -27,7 +27,7 @@ func slotIsInFuture(slot int, currentHour int) bool {
 }
 
 func convertUnixToTime(unix int64) time.Time {
-	return time.UnixMilli(unix)
+	return time.UnixMilli(unix).UTC()
 }
 
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {
@@ -47,6 +47,14 @@ var spawnUnixTimeIntervals = func() []int64 {
 	return timeIntervals
 }
 
+func getUnixStampsInBetweenTimesAsString(from int64, to int64) []string {
+	unixStampsInbetweenTimes := getUnixStampsInbetweenTimes(from, to)
+	var unixStampsInbetweenTimesAsString []string
+	for _, unixStamp := range unixStampsInbetweenTimes {
+		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToTime(unixStamp).Format("15:04"))
+	}
+	return unixStampsInbetweenTimesAsString
+}
 func getUnixStampsInbetweenTimes(from int64, to int64) []int64 {
 	timeIntervals := spawnUnixTimeIntervals()
 	var unixStampsInbetweenTimes []int64

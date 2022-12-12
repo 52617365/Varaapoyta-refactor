@@ -1,6 +1,7 @@
 package time
 
 import (
+	"golang.org/x/exp/slices"
 	"testing"
 	"time"
 )
@@ -71,4 +72,27 @@ func TestGetUnixStampsInbetweenTimes(t *testing.T) {
 	if len(actualUnixStampsInbetweenTimes) != 3 {
 		t.Errorf("expected %d, got %d", 3, len(actualUnixStampsInbetweenTimes))
 	}
+}
+
+func TestGetUnixStampsInBetweenTimesAsString(t *testing.T) {
+	spawnUnixTimeIntervals = func() []int64 {
+		return []int64{1625740000000, 1625742000000, 1625742000000 + 1800000, 1625742000000 + 3600000}
+	}
+	from := int64(1625741000000)
+	to := int64(9999999999999)
+
+	actualUnixStampsInbetweenTimes := getUnixStampsInBetweenTimesAsString(from, to)
+
+	expectedTimes := []string{"11:00", "11:30", "12:00"}
+
+	for _, time := range actualUnixStampsInbetweenTimes {
+		if !slices.Contains(expectedTimes, time) {
+			t.Errorf("expectedTimes does not contain %s", time)
+		}
+	}
+
+	if len(actualUnixStampsInbetweenTimes) != 3 {
+		t.Errorf("expected %d, got %d", 3, len(actualUnixStampsInbetweenTimes))
+	}
+
 }
