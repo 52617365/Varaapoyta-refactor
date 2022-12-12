@@ -114,7 +114,7 @@ func TestDeserializeRestaurantApiResponse(t *testing.T) {
 	response := `{"data": {"listRestaurantsByLocation": {"totalCount": 470}}}`
 	expectedTotalCount := 470
 
-	responseStruct := responseStructures.RestaurantApiResponse{}
+	responseStruct := &responseStructures.RestaurantApiResponse{}
 
 	bytes := []byte(response)
 	restaurant, err := deserializeResponse(bytes, responseStruct)
@@ -135,7 +135,7 @@ func TestDeserializeGraphApiResponse(t *testing.T) {
 	response := `[{"name": "Stone's", "intervals": [{"from": 1660322700000,"to": 1660322700000,"color": "transparent"}]}]`
 	expectedName := "Stone's"
 
-	responseStruct := responseStructures.GraphApiResponse{}
+	responseStruct := &responseStructures.GraphApiResponse{}
 
 	bytes := []byte(response)
 	restaurant, err := deserializeResponse(bytes, responseStruct)

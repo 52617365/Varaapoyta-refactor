@@ -48,7 +48,7 @@ var ReadRestaurantApiResponse = func(res *http.Response) (*responseStructures.Re
 }
 
 func deserializeRestaurantApiResponse(response []byte) (*responseStructures.RestaurantApiResponse, error) {
-	responseStructure := responseStructures.RestaurantApiResponse{}
+	responseStructure := &responseStructures.RestaurantApiResponse{}
 	deserializedResponse, err := deserializeResponse(response, responseStructure)
 	if err != nil {
 		return nil, err

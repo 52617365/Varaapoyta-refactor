@@ -81,7 +81,7 @@ func TestGetUnixStampsInBetweenTimesAsString(t *testing.T) {
 	from := int64(1625741000000)
 	to := int64(9999999999999)
 
-	actualUnixStampsInbetweenTimes := getUnixStampsInBetweenTimesAsString(from, to)
+	actualUnixStampsInbetweenTimes := GetUnixStampsInBetweenTimesAsString(from, to)
 
 	expectedTimes := []string{"1100", "1130", "1200"}
 

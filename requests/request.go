@@ -102,10 +102,10 @@ func deserializeResponse(response []byte, responseStructure interface{}) (interf
 	var typeOfStructure interface{}
 
 	switch responseStructure.(type) {
-	case responseStructures.GraphApiResponse:
+	case *responseStructures.GraphApiResponse:
 		typeOfStructure = &responseStructures.GraphApiResponse{}
 		break
-	case responseStructures.RestaurantApiResponse:
+	case *responseStructures.RestaurantApiResponse:
 		typeOfStructure = &responseStructures.RestaurantApiResponse{}
 		break
 	default:

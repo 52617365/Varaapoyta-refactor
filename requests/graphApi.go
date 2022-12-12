@@ -29,7 +29,7 @@ func GetTimeSlotFrom(requestUrl string) (*responseStructures.GraphApiResponse, e
 	if err != nil {
 		return nil, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
 	}
-	// TODO: here we want to extract the 15 minute time intervals in between from and to and ignore duplicates
+	// TODO: here we want to extract the 15-minute time intervals in between from and to and ignore duplicates
 	return deserializedResponse, nil
 }
 
