@@ -35,17 +35,14 @@ func TestGetTimeSlotFromReturnsRightErrors(t *testing.T) {
 }
 
 func TestUrlShouldBeSkipped(t *testing.T) {
-	err := &GraphNotVisible{}
-	if !urlShouldBeSkipped(err) {
+	if !urlShouldBeSkipped(&GraphNotVisible{}) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
 	}
-	err2 := &InvalidGraphApiIntervals{}
-	if !urlShouldBeSkipped(err2) {
+	if !urlShouldBeSkipped(&InvalidGraphApiIntervals{}) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
 	}
 
-	err3 := errors.New("test")
-	if urlShouldBeSkipped(err3) {
+	if urlShouldBeSkipped(errors.New("test")) {
 		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
 	}
 }
