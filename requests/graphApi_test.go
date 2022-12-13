@@ -50,7 +50,7 @@ func TestUrlShouldBeSkipped(t *testing.T) {
 	}
 }
 
-func TestTimeIntervalsAreIdentical(t *testing.T) {
+func TestTimeIntervalsAreIdenticalReturnsTrue(t *testing.T) {
 	r := &responseStructures.RelevantIndex{
 		Name:      "test",
 		Intervals: responseStructures.Intervals{{From: 22222, To: 22222}},
@@ -62,6 +62,17 @@ func TestTimeIntervalsAreIdentical(t *testing.T) {
 	}
 }
 
+func TestTimeIntervalsAreIdenticalReturnsFalse(t *testing.T) {
+	r := &responseStructures.RelevantIndex{
+		Name:      "test",
+		Intervals: responseStructures.Intervals{{From: 22222, To: 55555}},
+		ID:        2,
+	}
+
+	if timeIntervalsAreIdentical(r) {
+		t.Errorf("timeIntervalsAreIdentical - Expected time intervals to NOT be identical but they were.")
+	}
+}
 func mockRequestResult() {
 	json := `{"name": "test"}`
 	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(json)))
