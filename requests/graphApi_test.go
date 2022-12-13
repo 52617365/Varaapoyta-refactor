@@ -73,6 +73,28 @@ func TestTimeIntervalsAreIdenticalReturnsFalse(t *testing.T) {
 		t.Errorf("timeIntervalsAreIdentical - Expected time intervals to NOT be identical but they were.")
 	}
 }
+
+func TestGraphIsVisibleReturnsTrue(t *testing.T) {
+	r := &responseStructures.RelevantIndex{
+		Name:      "test",
+		Intervals: responseStructures.Intervals{{From: 22222, To: 55555, Color: ""}},
+		ID:        2,
+	}
+	if !graphIsVisible(r) {
+		t.Errorf("graphIsVisible - Expected graph to be visible but it wasn't.")
+	}
+}
+
+func TestGraphIsVisibleReturnsFalse(t *testing.T) {
+	r := &responseStructures.RelevantIndex{
+		Name:      "test",
+		Intervals: responseStructures.Intervals{{From: 22222, To: 55555, Color: "transparent"}},
+		ID:        2,
+	}
+	if graphIsVisible(r) {
+		t.Errorf("graphIsVisible - Expected graph to NOT be visible but it was.")
+	}
+}
 func mockRequestResult() {
 	json := `{"name": "test"}`
 	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(json)))
