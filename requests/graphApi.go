@@ -30,7 +30,7 @@ func urlShouldBeSkipped(err error) bool {
 	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
 }
 
-func GetTimeSlotFrom(requestUrl string) ([]string, error) { // this will be returning a string slice later on.
+var GetTimeSlotFrom = func(requestUrl string) ([]string, error) { // this will be returning a string slice later on.
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return []string{}, err
@@ -90,12 +90,12 @@ func getGraphApiRequestHandler(requestUrl string) *http.Request {
 	return requestHandler
 }
 
-var sendRequestToGraphApi = func(requestHandler *http.Request) (*http.Response, error) {
+func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error) {
 	response, err := sendRequest(requestHandler)
 	return response, err
 }
 
-func deserializeGraphApiResponse(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
+var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
 	deserializedType := responseStructures.GraphApiResponse{}
 	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
 	if err != nil {

@@ -24,6 +24,25 @@ func TestGetResponseFromGraphApi(t *testing.T) {
 	}
 }
 
+func TestGetGraphApiTimeSlotsFrom(t *testing.T) {
+	t.Skip("Not implemented yet")
+}
+
+func TestGetTimeSlotFromReturnsRightErrors(t *testing.T) {
+	t.Skip("Not implemented yet")
+}
+
+func TestUrlShouldBeSkipped(t *testing.T) {
+	err := &GraphNotVisible{}
+	if !urlShouldBeSkipped(err) {
+		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+	}
+	err2 := &InvalidGraphApiIntervals{}
+	if !urlShouldBeSkipped(err2) {
+		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+	}
+}
+
 func mockRequestResult() {
 	json := `{"name": "test"}`
 	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(json)))
