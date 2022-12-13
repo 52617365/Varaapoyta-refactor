@@ -90,8 +90,7 @@ func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error)
 }
 
 var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
-	deserializedType := responseStructures.GraphApiResponse{}
-	deserializedResponse, err := deserializeResponse(responseBuffer, &deserializedType)
+	deserializedResponse, err := deserializeResponse(responseBuffer, &responseStructures.GraphApiResponse{})
 	if err != nil {
 		return &responseStructures.RelevantIndex{}, err
 	}

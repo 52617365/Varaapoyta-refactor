@@ -41,7 +41,6 @@ func TestUrlShouldBeSkipped(t *testing.T) {
 	if !urlShouldBeSkipped(&InvalidGraphApiIntervals{}) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
 	}
-
 	if urlShouldBeSkipped(errors.New("test")) {
 		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
 	}
