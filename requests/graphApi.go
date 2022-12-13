@@ -12,19 +12,19 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	urls := GetGraphApiUrls(restaurantId)
 	var allTimeSlots []string
 	for _, url := range urls {
-		timeSlots, err := GetTimeSlotFrom(url)
+		timeSlots, err := GetTimeSlotsFrom(url)
 		if err != nil {
 			if urlShouldBeSkipped(err) {
 				continue
 			}
-			return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
+			return nil, fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)
 		}
 		allTimeSlots = append(allTimeSlots, timeSlots...)
 	}
 	return allTimeSlots, nil
 }
 
-var GetTimeSlotFrom = func(requestUrl string) ([]string, error) {
+var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return []string{}, err

@@ -34,7 +34,7 @@ func TestGetGraphApiTimeSlotsFrom(t *testing.T) {
 func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {
 	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":"transparent"}],"id":281}]`)
 
-	_, err := GetTimeSlotFrom("test")
+	_, err := GetTimeSlotsFrom("test")
 	graphNotVisible := &GraphNotVisible{}
 	if !errors.As(err, &graphNotVisible) {
 		t.Errorf("getTimeSlotFrom - Expected error to be of type GraphNotVisible but it wasn't.")
@@ -43,15 +43,31 @@ func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {
 func TestGetTimeSlotFromReturnsInvalidGraphApiIntervals(t *testing.T) {
 	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":""}],"id":281}]`)
 
-	_, err := GetTimeSlotFrom("test")
+	_, err := GetTimeSlotsFrom("test")
 	invalidGraphApiIntervals := &InvalidGraphApiIntervals{}
 	if !errors.As(err, &invalidGraphApiIntervals) {
 		t.Errorf("getTimeSlotFrom - Expected error to be of type InvalidGraphApiIntervals but it wasn't.")
 	}
 }
 func TestGetTimeSlotFrom(t *testing.T) {
-	t.Skip("Not implemented yet")
+	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1670875200000,"color":""}],"id":281}]`)
+	mockUnixTimeStampsBetweenTimesAsString([]string{"1900", "1915", "1930", "1945", "2000"})
+
+	expectedTimeSlots := []string{"1900", "1915", "1930", "1945", "2000"}
+	timeSlots, err := GetTimeSlotsFrom("test")
+	if err != nil {
+		t.Errorf("getTimeSlotFrom - Error getting time slots from mock graph api.")
+	}
+	if len(timeSlots) != len(expectedTimeSlots) {
+		t.Errorf("getTimeSlotFrom - Expected time slots length to be %d but got %d", len(expectedTimeSlots), len(timeSlots))
+	}
+	for i, timeSlot := range timeSlots {
+		if timeSlot != expectedTimeSlots[i] {
+			t.Errorf("getTimeSlotFrom - Expected time slot to be %s but got %s", expectedTimeSlots[i], timeSlot)
+		}
+	}
 }
+
 func TestUrlShouldBeSkipped(t *testing.T) {
 	if !urlShouldBeSkipped(&GraphNotVisible{}) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
