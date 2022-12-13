@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 	"varaapoyta-backend-refactor/responseStructures"
+	"varaapoyta-backend-refactor/time"
 )
 
 func TestGetResponseFromGraphApi(t *testing.T) {
@@ -116,5 +117,11 @@ func mockRequestResult(returnValue string) {
 			StatusCode: 200,
 			Body:       mockResponseBuffer,
 		}, nil
+	}
+}
+
+func mockUnixTimeStampsBetweenTimesAsString(returnValue []string) {
+	time.GetUnixStampsInBetweenTimesAsString = func(fromMs int64, toMs int64) []string {
+		return returnValue
 	}
 }

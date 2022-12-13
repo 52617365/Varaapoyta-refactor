@@ -47,7 +47,7 @@ var spawnUnixTimeIntervals = func() []int64 {
 	return timeIntervals
 }
 
-func GetUnixStampsInBetweenTimesAsString(fromMs int64, toMs int64) []string {
+var GetUnixStampsInBetweenTimesAsString = func(fromMs int64, toMs int64) []string {
 	unixStampsInbetweenTimes := getUnixStampsInbetweenTimes(fromMs, toMs)
 
 	var unixStampsInbetweenTimesAsString []string
@@ -56,6 +56,7 @@ func GetUnixStampsInBetweenTimesAsString(fromMs int64, toMs int64) []string {
 	}
 	return unixStampsInbetweenTimesAsString
 }
+
 func getUnixStampsInbetweenTimes(from int64, to int64) []int64 {
 	timeIntervals := spawnUnixTimeIntervals()
 	unixStampsInbetweenTimes := make([]int64, 0, 96)
