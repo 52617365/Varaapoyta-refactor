@@ -2,6 +2,7 @@ package requests
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"testing"
@@ -40,6 +41,11 @@ func TestUrlShouldBeSkipped(t *testing.T) {
 	err2 := &InvalidGraphApiIntervals{}
 	if !urlShouldBeSkipped(err2) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+	}
+
+	err3 := errors.New("test")
+	if urlShouldBeSkipped(err3) {
+		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
 	}
 }
 

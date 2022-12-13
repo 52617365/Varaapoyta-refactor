@@ -10,7 +10,7 @@ import (
 
 func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	urls := GetGraphApiUrls(restaurantId)
-	var deDupTimeSlots []string
+	var allTimeSlots []string
 	for _, url := range urls {
 		timeSlots, err := GetTimeSlotFrom(url)
 		if err != nil {
@@ -19,15 +19,9 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 			}
 			return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
 		}
-		deDupTimeSlots = append(deDupTimeSlots, timeSlots...)
+		allTimeSlots = append(allTimeSlots, timeSlots...)
 	}
-	return deDupTimeSlots, nil
-}
-
-func urlShouldBeSkipped(err error) bool {
-	graphIsMissing := &GraphNotVisible{}
-	invalidGraphIntervals := &InvalidGraphApiIntervals{}
-	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
+	return allTimeSlots, nil
 }
 
 var GetTimeSlotFrom = func(requestUrl string) ([]string, error) { // this will be returning a string slice later on.
@@ -103,4 +97,10 @@ var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructur
 	}
 	result := deserializedResponse.(*responseStructures.GraphApiResponse)
 	return &(*result)[0], nil
+}
+
+func urlShouldBeSkipped(err error) bool {
+	graphIsMissing := &GraphNotVisible{}
+	invalidGraphIntervals := &InvalidGraphApiIntervals{}
+	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
 }
