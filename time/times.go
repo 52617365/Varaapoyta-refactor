@@ -49,6 +49,7 @@ var spawnUnixTimeIntervals = func() []int64 {
 
 func GetUnixStampsInBetweenTimesAsString(fromMs int64, toMs int64) []string {
 	unixStampsInbetweenTimes := getUnixStampsInbetweenTimes(fromMs, toMs)
+
 	var unixStampsInbetweenTimesAsString []string
 	for _, unixStamp := range unixStampsInbetweenTimes {
 		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToTime(unixStamp).Format("1504"))

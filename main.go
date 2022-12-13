@@ -9,6 +9,7 @@ import (
 // Regex:
 
 func main() {
-	graphApiTimeSlot, _ := requests.GetTimeSlotFrom("https://s-varaukset.fi/api/recommendations/slot/281/2022-08-12/2145/1")
-	fmt.Println(graphApiTimeSlot)
+	//graphApiTimeSlot, _ := requests.GetTimeSlotFrom("https://s-varaukset.fi/api/recommendations/slot/38/2022-12-12/1400/1")
+	timeSlots, _ := requests.GetGraphApiTimeSlotsFrom("1685")
+	fmt.Println(timeSlots)
 }
