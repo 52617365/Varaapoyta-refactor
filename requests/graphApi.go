@@ -40,16 +40,24 @@ func GetTimeSlotFrom(requestUrl string) ([]string, error) { // this will be retu
 		return []string{}, fmt.Errorf("deserializeGraphApiResponse - Error deserializing response. - %w", err)
 	}
 
-	if !graphIsVisible(deserializedResponse) {
-		return []string{}, &GraphNotVisible{}
-	}
-
-	if timeIntervalsAreIdentical(deserializedResponse) {
-		return []string{}, &InvalidGraphApiIntervals{}
+	err = errOnInvalidData(deserializedResponse)
+	if err != nil {
+		return []string{}, err
 	}
 
 	timeSlots := time.GetUnixStampsInBetweenTimesAsString(deserializedResponse.Intervals[0].From, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
+}
+
+func errOnInvalidData(deserializedResponse *responseStructures.RelevantIndex) error {
+	if !graphIsVisible(deserializedResponse) {
+		return &GraphNotVisible{}
+	}
+
+	if timeIntervalsAreIdentical(deserializedResponse) {
+		return &InvalidGraphApiIntervals{}
+	}
+	return nil
 }
 
 func timeIntervalsAreIdentical(deserializedResponse *responseStructures.RelevantIndex) bool {
