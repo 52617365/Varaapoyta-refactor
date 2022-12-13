@@ -18,3 +18,9 @@ type RelevantIndex = struct {
 	} `json:"intervals"`
 	ID int `json:"id"`
 }
+
+type Intervals = []struct {
+	From  int64  `json:"from"`
+	To    int64  `json:"to"`
+	Color string `json:"color"`
+}

@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"varaapoyta-backend-refactor/responseStructures"
 )
 
 func TestGetResponseFromGraphApi(t *testing.T) {
@@ -46,6 +47,18 @@ func TestUrlShouldBeSkipped(t *testing.T) {
 	err3 := errors.New("test")
 	if urlShouldBeSkipped(err3) {
 		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
+	}
+}
+
+func TestTimeIntervalsAreIdentical(t *testing.T) {
+	r := &responseStructures.RelevantIndex{
+		Name:      "test",
+		Intervals: responseStructures.Intervals{{From: 22222, To: 22222}},
+		ID:        2,
+	}
+
+	if !timeIntervalsAreIdentical(r) {
+		t.Errorf("timeIntervalsAreIdentical - Expected time intervals to be identical but they weren't.")
 	}
 }
 
