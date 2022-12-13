@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetResponseFromGraphApi(t *testing.T) {
-	mockRequestResult()
+	mockRequestResult(`{"name": "test"}`)
 
 	json := `{"name": "test"}`
 	expectedResponseBuffer := io.NopCloser(bytes.NewReader([]byte(json))) // making new buffer because a singular one can't be read twice.
@@ -91,9 +91,8 @@ func TestGraphIsVisibleReturnsFalse(t *testing.T) {
 		t.Errorf("graphIsVisible - Expected graph to NOT be visible but it was.")
 	}
 }
-func mockRequestResult() {
-	json := `{"name": "test"}`
-	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(json)))
+func mockRequestResult(returnValue string) {
+	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(returnValue)))
 
 	sendRequest = func(requestHandler *http.Request) (*http.Response, error) {
 		return &http.Response{

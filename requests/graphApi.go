@@ -24,7 +24,7 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	return allTimeSlots, nil
 }
 
-var GetTimeSlotFrom = func(requestUrl string) ([]string, error) { // this will be returning a string slice later on.
+var GetTimeSlotFrom = func(requestUrl string) ([]string, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
 		return []string{}, err
@@ -38,7 +38,6 @@ var GetTimeSlotFrom = func(requestUrl string) ([]string, error) { // this will b
 	if err != nil {
 		return []string{}, err
 	}
-
 	timeSlots := time.GetUnixStampsInBetweenTimesAsString(deserializedResponse.Intervals[0].From, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
 }
