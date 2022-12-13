@@ -30,10 +30,27 @@ func TestGetGraphApiTimeSlotsFrom(t *testing.T) {
 	t.Skip("Not implemented yet")
 }
 
-func TestGetTimeSlotFromReturnsRightErrors(t *testing.T) {
+func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {
+	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":"transparent"}],"id":281}]`)
+
+	_, err := GetTimeSlotFrom("test")
+	graphNotVisible := &GraphNotVisible{}
+	if !errors.As(err, &graphNotVisible) {
+		t.Errorf("getTimeSlotFrom - Expected error to be of type GraphNotVisible but it wasn't.")
+	}
+}
+func TestGetTimeSlotFromReturnsInvalidGraphApiIntervals(t *testing.T) {
+	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":""}],"id":281}]`)
+
+	_, err := GetTimeSlotFrom("test")
+	invalidGraphApiIntervals := &InvalidGraphApiIntervals{}
+	if !errors.As(err, &invalidGraphApiIntervals) {
+		t.Errorf("getTimeSlotFrom - Expected error to be of type InvalidGraphApiIntervals but it wasn't.")
+	}
+}
+func TestGetTimeSlotFrom(t *testing.T) {
 	t.Skip("Not implemented yet")
 }
-
 func TestUrlShouldBeSkipped(t *testing.T) {
 	if !urlShouldBeSkipped(&GraphNotVisible{}) {
 		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
