@@ -19,12 +19,7 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 			}
 			return nil, fmt.Errorf("GetTimeSlotFrom - Error getting time slot from graph api. - %w", err)
 		}
-		// TODO: we will probably iterate the time slots here and append to the timeSlots slice ignoring duplicates.
-		for _, timeSlot := range timeSlots {
-			//if !slices.Contains(deDupTimeSlots, timeSlot) {
-			deDupTimeSlots = append(deDupTimeSlots, timeSlot)
-			//}
-		}
+		deDupTimeSlots = append(deDupTimeSlots, timeSlots...)
 	}
 	return deDupTimeSlots, nil
 }
