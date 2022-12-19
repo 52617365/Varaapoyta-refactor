@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	timeSlots, _ := requests.GetGraphApiTimeSlotsFrom("1685")
+	timeSlots, _ := requests.GetGraphApiTimeSlotsFrom("1679")
 	fmt.Println(timeSlots)
 }

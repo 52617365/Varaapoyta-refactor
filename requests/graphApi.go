@@ -24,6 +24,12 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	return allTimeSlots, nil
 }
 
+func urlShouldBeSkipped(err error) bool {
+	graphIsMissing := &GraphNotVisible{}
+	invalidGraphIntervals := &InvalidGraphApiIntervals{}
+	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
+}
+
 var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
@@ -38,27 +44,10 @@ var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
+	// TODO: change the .from argument into a variable that takes into consideration the current time in unix.
+	// this means that we don't want the time slots before the current time slot.
 	timeSlots := time.GetUnixStampsInBetweenTimesAsString(deserializedResponse.Intervals[0].From, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
-}
-
-func errOnInvalidData(deserializedResponse *responseStructures.RelevantIndex) error {
-	if !graphIsVisible(deserializedResponse) {
-		return &GraphNotVisible{}
-	}
-
-	if timeIntervalsAreIdentical(deserializedResponse) {
-		return &InvalidGraphApiIntervals{}
-	}
-	return nil
-}
-
-func timeIntervalsAreIdentical(deserializedResponse *responseStructures.RelevantIndex) bool {
-	return deserializedResponse.Intervals[0].From == deserializedResponse.Intervals[0].To
-}
-
-func graphIsVisible(deserializedResponse *responseStructures.RelevantIndex) bool {
-	return deserializedResponse.Intervals[0].Color != "transparent"
 }
 
 func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
@@ -88,6 +77,24 @@ func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error)
 	return response, err
 }
 
+func errOnInvalidData(deserializedResponse *responseStructures.RelevantIndex) error {
+	if !graphIsVisible(deserializedResponse) {
+		return &GraphNotVisible{}
+	}
+
+	if timeIntervalsAreIdentical(deserializedResponse) {
+		return &InvalidGraphApiIntervals{}
+	}
+	return nil
+}
+func graphIsVisible(deserializedResponse *responseStructures.RelevantIndex) bool {
+	return deserializedResponse.Intervals[0].Color != "transparent"
+}
+
+func timeIntervalsAreIdentical(deserializedResponse *responseStructures.RelevantIndex) bool {
+	return deserializedResponse.Intervals[0].From == deserializedResponse.Intervals[0].To
+}
+
 var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
 	deserializedResponse, err := deserializeResponse(responseBuffer, &responseStructures.GraphApiResponse{})
 	if err != nil {
@@ -95,10 +102,4 @@ var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructur
 	}
 	result := deserializedResponse.(*responseStructures.GraphApiResponse)
 	return &(*result)[0], nil
-}
-
-func urlShouldBeSkipped(err error) bool {
-	graphIsMissing := &GraphNotVisible{}
-	invalidGraphIntervals := &InvalidGraphApiIntervals{}
-	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
 }
