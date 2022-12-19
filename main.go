@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	restaurants, _ := requests.GetRestaurants()
+	restaurants, _ := requests.GetRestaurants("Rovaniemi")
 	for _, restaurant := range restaurants {
 		timeSlots, _ := requests.GetGraphApiTimeSlotsFrom(restaurant.ReservationPageID)
 		fmt.Println(timeSlots)

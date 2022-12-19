@@ -8,7 +8,7 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
-func GetRestaurants() ([]responseStructures.Edges, error) {
+func GetRestaurants(city string) ([]responseStructures.Edges, error) {
 	api := &Api{
 		Name: "restaurant",
 	}
@@ -26,7 +26,7 @@ func GetRestaurants() ([]responseStructures.Edges, error) {
 	if err != nil {
 		return nil, err
 	}
-	validRestaurants := filterRestaurants(restaurants)
+	validRestaurants := filterRestaurants(restaurants, city)
 	return validRestaurants, nil
 }
 
@@ -56,17 +56,17 @@ func deserializeRestaurantApiResponse(response []byte) (*responseStructures.Rest
 	return result, nil
 }
 
-func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
-	validRestaurants := getValidRestaurants(restaurants)
+func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse, city string) []responseStructures.Edges {
+	validRestaurants := getValidRestaurants(restaurants, city)
 	setReservationIdsToRestaurants(validRestaurants)
 	return validRestaurants
 }
 
 // getValidRestaurants TODO: add city into the filtering later.
-func getValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
-	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges))
+func getValidRestaurants(restaurants *responseStructures.RestaurantApiResponse, city string) []responseStructures.Edges {
+	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges)/3)
 	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
-		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) {
+		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) && restaurantIsFromCorrectCity(restaurant.Address.Municipality.FiFI, city) {
 			validRestaurants = append(validRestaurants, restaurant)
 		}
 	}
@@ -98,12 +98,19 @@ func getReservationIdFrom(reservationPageUrl string) (string, error) {
 	return restaurantId, nil
 }
 
-func reservationPageExists(reservationPageUrl string) bool {
-	if reservationPageUrl == "" {
+func reservationPageExists(reservationUrl string) bool {
+	if reservationUrl == "" {
 		return false
 	}
-	if !strings.Contains(reservationPageUrl, "https://s-varaukset.fi/online/reservation/fi/") {
+	if !strings.Contains(reservationUrl, "https://s-varaukset.fi/online/reservation/fi/") {
 		return false
 	}
 	return true
+}
+
+func restaurantIsFromCorrectCity(restaurantCity string, usersCity string) bool {
+	if strings.ToLower(restaurantCity) == strings.ToLower(usersCity) {
+		return true
+	}
+	return false
 }

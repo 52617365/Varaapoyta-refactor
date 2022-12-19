@@ -33,7 +33,6 @@ func slotIsInFuture(slot int, currentHour int) bool {
 func convertUnixToFinnishTime(unix int64) time.Time {
 	t := time.UnixMilli(unix).UTC().Add(2 * time.Hour)
 	return t
-	//return time.UnixMilli(unix).UTC()
 }
 
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {

@@ -19,7 +19,7 @@ func TestGetValidRestaurants(t *testing.T) {
 		return &responseStructures.RestaurantApiResponse{}, nil
 	}
 
-	_, err := GetRestaurants()
+	_, err := GetRestaurants("Rovaniemi")
 	if err != nil {
 		t.Errorf("GetRestaurants - Threw an unexpected error.")
 	}
@@ -29,7 +29,7 @@ func TestGetInvalidRestaurants(t *testing.T) {
 		return nil, errors.New("GetRestaurants - could not get response from api.raflaamo.fi/query")
 	}
 
-	_, err := GetRestaurants()
+	_, err := GetRestaurants("Rovaniemi")
 	if err == nil {
 		t.Errorf("GetRestaurants - Did not throw an error when we expected it to.")
 	}
@@ -55,9 +55,9 @@ func TestErrorGetReservationPageIdFrom(t *testing.T) {
 }
 func TestReservationPageExistsTrue(t *testing.T) {
 	urlToMatch := "https://s-varaukset.fi/online/reservation/fi/72?_ga=2.161416895.382807502.1612853101-189045693.1611044564"
-	actual := reservationPageExists(urlToMatch)
-	if !actual {
-		t.Errorf("reservationPageExists - expected true, got %t", actual)
+	exists := reservationPageExists(urlToMatch)
+	if !exists {
+		t.Errorf("reservationPageExists - expected true, got %t", exists)
 	}
 }
 func TestReservationPageExistsFalse(t *testing.T) {
@@ -112,12 +112,13 @@ func TestSetReservationPageIds(t *testing.T) {
 
 func TestFilterValidRestaurants(t *testing.T) {
 	apiResponse := `{"data": {"listRestaurantsByLocation": {"totalCount": 467,"edges": [
-		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
-		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Rovaniemi"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}
 	]}}}`
 	response := []byte(apiResponse)
 	restaurants, _ := deserializeRestaurantApiResponse(response)
-	validRestaurants := getValidRestaurants(restaurants)
+	validRestaurants := getValidRestaurants(restaurants, "rovaniemi")
 
 	for _, validRestaurant := range validRestaurants {
 		if validRestaurant.Links.TableReservationLocalized.FiFI == "" {
@@ -132,11 +133,14 @@ func TestFilterValidRestaurants(t *testing.T) {
 func TestFilterRestaurants(t *testing.T) {
 	apiResponse := `{"data": {"listRestaurantsByLocation": {"totalCount": 467,"edges": [
 		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
-		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Helsinki"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": ""},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}},
+		{"id": "563","name": {"fi_FI": "Tilausravintola Presidentti"},"address": {"municipality": {"fi_FI": "Rovaniemi"},"street": {"fi_FI": "Eteläinen Rautatiekatu 4"},"zipCode": "00100"},"openingTime": {"restaurantTime": {"ranges": null},"kitchenTime": {"ranges": null}},"links": {"tableReservationLocalized": {"fi_FI": "https://s-varaukset.fi/online/reservation/fi/38?_ga=2.146560948.1092747230.1612503015-489168449.1604043706"},"homepageLocalized": {"fi_FI": "https://www.raflaamo.fi/fi/helsinki/tilausravintola-presidentti"}}}
 	]}}}`
 	response := []byte(apiResponse)
+
+	city := "helsinki"
 	restaurants, _ := deserializeRestaurantApiResponse(response)
-	validRestaurants := filterRestaurants(restaurants)
+	validRestaurants := filterRestaurants(restaurants, "city")
 
 	for _, validRestaurant := range validRestaurants {
 		if validRestaurant.Links.TableReservationLocalized.FiFI == "" {
@@ -144,6 +148,9 @@ func TestFilterRestaurants(t *testing.T) {
 		}
 		if validRestaurant.ReservationPageID == "" {
 			t.Errorf("filterRestaurants - expected a valid restaurant reservation page id, got %s", validRestaurant.ReservationPageID)
+		}
+		if validRestaurant.Address.Municipality.FiFI != city {
+			t.Errorf("filterRestaurants - expected a valid restaurant city, got %s", validRestaurant.Address.Municipality.FiFI)
 		}
 	}
 }
