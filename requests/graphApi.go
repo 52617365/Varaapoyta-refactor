@@ -44,9 +44,8 @@ var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	// TODO: change the .from argument into a variable that takes into consideration the current time in unix.
-	// this means that we don't want the time slots before the current time slot.
-	timeSlots := time.GetUnixStampsInBetweenTimesAsString(deserializedResponse.Intervals[0].From, deserializedResponse.Intervals[0].To)
+	fromTime := getFromAsCurrentTimeIfSmallerThan(deserializedResponse.Intervals[0].From)
+	timeSlots := time.GetUnixStampsInBetweenTimesAsString(fromTime, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
 }
 
@@ -93,6 +92,20 @@ func graphIsVisible(deserializedResponse *responseStructures.RelevantIndex) bool
 
 func timeIntervalsAreIdentical(deserializedResponse *responseStructures.RelevantIndex) bool {
 	return deserializedResponse.Intervals[0].From == deserializedResponse.Intervals[0].To
+}
+
+func getFromAsCurrentTimeIfSmallerThan(from int64) int64 {
+	var resultFrom int64
+	if currentTimeIsSmallerThanFrom(from) {
+		resultFrom = time.GetCurrentTimeInUnixMs()
+	} else {
+		resultFrom = from
+	}
+	return resultFrom
+}
+func currentTimeIsSmallerThanFrom(from int64) bool {
+	currentTimeUnix := time.GetCurrentTimeInUnixMs()
+	return from > currentTimeUnix
 }
 
 var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {

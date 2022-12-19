@@ -26,7 +26,7 @@ func TestSlotIsInFuture(t *testing.T) {
 
 func TestConvertUnixToTime(t *testing.T) {
 	unix := int64(1625744000000)
-	actualTime := convertUnixToTime(unix)
+	actualTime := convertUnixToFinnishTime(unix)
 
 	expectedTime := time.Date(2021, time.July, 8, 0, 0, 0, 0, time.UTC)
 	if actualTime.Day() != expectedTime.Day() {
@@ -83,7 +83,7 @@ func TestGetUnixStampsInBetweenTimesAsString(t *testing.T) {
 
 	actualUnixStampsInbetweenTimes := GetUnixStampsInBetweenTimesAsString(from, to)
 
-	expectedTimes := []string{"1100", "1130", "1200"}
+	expectedTimes := []string{"1300", "1330", "1400"}
 
 	for _, time := range actualUnixStampsInbetweenTimes {
 		if !slices.Contains(expectedTimes, time) {

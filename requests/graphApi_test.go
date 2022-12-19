@@ -125,6 +125,14 @@ func TestGraphIsVisibleReturnsFalse(t *testing.T) {
 		t.Errorf("graphIsVisible - Expected graph to NOT be visible but it was.")
 	}
 }
+
+func TestGetCurrentTimeInUnixMs(t *testing.T) {
+	currentTime := time.GetCurrentTimeInUnixMs()
+	if currentTime < 0 {
+		t.Errorf("getCurrentTimeInUnixMs - Expected current time to be positive but it wasn't.")
+	}
+}
+
 func mockRequestResult(returnValue string) {
 	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(returnValue)))
 

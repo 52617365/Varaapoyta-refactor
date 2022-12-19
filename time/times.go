@@ -22,12 +22,19 @@ func GetCurrentHour() int {
 	return currentHour
 }
 
+// GetCurrentTimeInUnixMs TODO: take into consideration timezone (+2h).
+func GetCurrentTimeInUnixMs() int64 {
+	return time.Now().UnixMilli()
+}
+
 func slotIsInFuture(slot int, currentHour int) bool {
 	return slot >= currentHour
 }
 
-func convertUnixToTime(unix int64) time.Time {
-	return time.UnixMilli(unix).UTC()
+func convertUnixToFinnishTime(unix int64) time.Time {
+	t := time.UnixMilli(unix).UTC().Add(2 * time.Hour)
+	return t
+	//return time.UnixMilli(unix).UTC()
 }
 
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {
@@ -52,7 +59,7 @@ var GetUnixStampsInBetweenTimesAsString = func(fromMs int64, toMs int64) []strin
 
 	var unixStampsInbetweenTimesAsString []string
 	for _, unixStamp := range unixStampsInbetweenTimes {
-		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToTime(unixStamp).Format("1504"))
+		unixStampsInbetweenTimesAsString = append(unixStampsInbetweenTimesAsString, convertUnixToFinnishTime(unixStamp).Format("1504"))
 	}
 	return unixStampsInbetweenTimesAsString
 }
