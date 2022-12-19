@@ -22,7 +22,6 @@ func GetCurrentHour() int {
 	return currentHour
 }
 
-// GetCurrentTimeInUnixMs TODO: take into consideration timezone (+2h).
 func GetCurrentTimeInUnixMs() int64 {
 	return time.Now().UnixMilli()
 }

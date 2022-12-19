@@ -62,10 +62,11 @@ func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse) []
 	return validRestaurants
 }
 
+// getValidRestaurants TODO: add city into the filtering later.
 func getValidRestaurants(restaurants *responseStructures.RestaurantApiResponse) []responseStructures.Edges {
 	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges))
 	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
-		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) { // TODO: add city into the filtering later.
+		if reservationPageExists(restaurant.Links.TableReservationLocalized.FiFI) {
 			validRestaurants = append(validRestaurants, restaurant)
 		}
 	}
