@@ -8,6 +8,8 @@ import (
 	"testing"
 	"varaapoyta-backend-refactor/responseStructures"
 	"varaapoyta-backend-refactor/time"
+
+	"golang.org/x/exp/slices"
 )
 
 func TestGetResponseFromGraphApi(t *testing.T) {
@@ -28,7 +30,25 @@ func TestGetResponseFromGraphApi(t *testing.T) {
 }
 
 func TestGetGraphApiTimeSlotsFrom(t *testing.T) {
-	t.Skip("Not implemented yet")
+	originalTimeSlotsFrom := GetTimeSlotsFrom
+
+	mockedTimes := []string{"1900", "1915", "1930", "1945", "2000"}
+	GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
+		return mockedTimes, nil
+	}
+
+	timeSlots, err := GetGraphApiTimeSlotsFrom("123")
+	if err != nil {
+		t.Errorf("GetGraphApiTimeSlotsFrom - Expected error to be nil but it wasn't.")
+	}
+
+	for _, mockedTime := range mockedTimes {
+		if !slices.Contains(timeSlots, mockedTime) {
+			t.Errorf("GetGraphApiTimeSlotsFrom - expected time slot %s to be in timeSlots but it wasn't.", mockedTime)
+		}
+	}
+
+	GetTimeSlotsFrom = originalTimeSlotsFrom
 }
 
 func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {

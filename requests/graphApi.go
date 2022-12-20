@@ -23,7 +23,6 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 		wg.Add(1)
 		go func(url string) {
 			defer wg.Done()
-			// TODO: we want to use goroutines here.
 			timeSlots, err := GetTimeSlotsFrom(url)
 			if err != nil {
 				if urlShouldBeSkipped(err) {
@@ -32,10 +31,8 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 				}
 				graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)}
 				return
-				// return nil, fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)
 			}
 			graphTimeSlots <- GraphTimeSlots{timeSlots: timeSlots, err: nil}
-			// allTimeSlots = append(allTimeSlots, timeSlots...)
 		}(url)
 	}
 	wg.Wait()
