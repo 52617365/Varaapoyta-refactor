@@ -8,6 +8,30 @@ import (
 	"varaapoyta-backend-refactor/responseStructures"
 )
 
+type RestaurantWithTimeSlots struct {
+	restaurant *responseStructures.Edges
+	timeSlots  []string
+}
+
+func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error) {
+	restaurants, err := GetRestaurants(city)
+	if err != nil {
+		return nil, err
+	}
+
+	restaurantsWithTimeSlots := make([]RestaurantWithTimeSlots, 0, len(restaurants))
+	for _, restaurant := range restaurants {
+		// TODO: we want to use goroutines here.
+		timeSlots, err := GetGraphApiTimeSlotsFrom(restaurant.ReservationPageID)
+		if err != nil {
+			return nil, err
+		}
+		restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: &restaurant, timeSlots: timeSlots}
+		restaurantsWithTimeSlots = append(restaurantsWithTimeSlots, restaurantWithTimeSlots)
+	}
+	return restaurantsWithTimeSlots, nil
+}
+
 func GetRestaurants(city string) ([]responseStructures.Edges, error) {
 	api := &Api{
 		Name: "restaurant",
