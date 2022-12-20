@@ -11,3 +11,9 @@ type GraphNotVisible struct{}
 func (m *GraphNotVisible) Error() string {
 	return "graph was not visible, color was set to transparent"
 }
+
+type UrlShouldBeSkipped struct{}
+
+func (m *UrlShouldBeSkipped) Error() string {
+	return "Url should be skipped."
+}
