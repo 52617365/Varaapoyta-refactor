@@ -62,7 +62,6 @@ func filterRestaurants(restaurants *responseStructures.RestaurantApiResponse, ci
 	return validRestaurants
 }
 
-// getValidRestaurants TODO: add city into the filtering later.
 func getValidRestaurants(restaurants *responseStructures.RestaurantApiResponse, city string) []responseStructures.Edges {
 	validRestaurants := make([]responseStructures.Edges, 0, len(restaurants.Data.ListRestaurantsByLocation.Edges)/3)
 	for _, restaurant := range restaurants.Data.ListRestaurantsByLocation.Edges {
