@@ -4,25 +4,61 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"varaapoyta-backend-refactor/responseStructures"
 	"varaapoyta-backend-refactor/time"
 )
 
+type GraphTimeSlots struct {
+	timeSlots []string
+	err       error
+}
+
 func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	urls := GetGraphApiUrls(restaurantId)
-	var allTimeSlots []string
+	graphTimeSlots := make(chan GraphTimeSlots, len(urls))
+
+	wg := sync.WaitGroup{}
 	for _, url := range urls {
-		// TODO: we want to use goroutines here.
-		timeSlots, err := GetTimeSlotsFrom(url)
-		if err != nil {
-			if urlShouldBeSkipped(err) {
+		wg.Add(1)
+		go func(url string) {
+			defer wg.Done()
+			// TODO: we want to use goroutines here.
+			timeSlots, err := GetTimeSlotsFrom(url)
+			if err != nil {
+				if urlShouldBeSkipped(err) {
+					graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
+					return
+				}
+				graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)}
+				return
+				// return nil, fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)
+			}
+			graphTimeSlots <- GraphTimeSlots{timeSlots: timeSlots, err: nil}
+			// allTimeSlots = append(allTimeSlots, timeSlots...)
+		}(url)
+	}
+	wg.Wait()
+	close(graphTimeSlots)
+
+	allTimeSlots, err := syncGraphTimeSlots(graphTimeSlots)
+
+	return allTimeSlots, err
+}
+
+func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
+	syncedTimeSlots := make([]string, 0, 96)
+	for timeSlot := range graphTimeSlots {
+		if timeSlot.err != nil {
+			urlShouldBeSkipped := &UrlShouldBeSkipped{}
+			if errors.As(timeSlot.err, &urlShouldBeSkipped) {
 				continue
 			}
-			return nil, fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)
+			return []string{}, timeSlot.err
 		}
-		allTimeSlots = append(allTimeSlots, timeSlots...)
+		syncedTimeSlots = append(syncedTimeSlots, timeSlot.timeSlots...)
 	}
-	return allTimeSlots, nil
+	return syncedTimeSlots, nil
 }
 
 func urlShouldBeSkipped(err error) bool {
