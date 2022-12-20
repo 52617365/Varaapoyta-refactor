@@ -51,7 +51,7 @@ func handleTimeSlotErr(err error, graphTimeSlots chan GraphTimeSlots) {
 		graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
 		return
 	}
-	graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)}
+	graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Raflaamo graph api might be down. - %w", err)}
 }
 
 func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
