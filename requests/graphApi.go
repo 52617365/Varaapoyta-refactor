@@ -15,32 +15,43 @@ type GraphTimeSlots struct {
 }
 
 func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
-	urls := GetGraphApiUrls(restaurantId)
-	graphTimeSlots := make(chan GraphTimeSlots, len(urls))
+	urls := GetGraphApiUrlsFrom(restaurantId)
 
 	wg := sync.WaitGroup{}
+
+	graphTimeSlots := make(chan GraphTimeSlots, len(urls))
+
 	for _, url := range urls {
-		wg.Add(1)
-		go func(url string) {
-			defer wg.Done()
-			timeSlots, err := GetTimeSlotsFrom(url)
-			if err != nil {
-				if urlShouldBeSkipped(err) {
-					graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
-					return
-				}
-				graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)}
-				return
-			}
-			graphTimeSlots <- GraphTimeSlots{timeSlots: timeSlots, err: nil}
-		}(url)
+		getTimeSlotsWithGoRoutine(url, graphTimeSlots, &wg)
 	}
+
 	wg.Wait()
 	close(graphTimeSlots)
 
 	allTimeSlots, err := syncGraphTimeSlots(graphTimeSlots)
 
 	return allTimeSlots, err
+}
+
+func getTimeSlotsWithGoRoutine(url string, graphTimeSlots chan GraphTimeSlots, wg *sync.WaitGroup) {
+	wg.Add(1)
+	go func(url string) {
+		defer wg.Done()
+		timeSlots, err := GetTimeSlotsFrom(url)
+		if err != nil {
+			handleTimeSlotErr(err, graphTimeSlots)
+			return
+		}
+		graphTimeSlots <- GraphTimeSlots{timeSlots: timeSlots, err: nil}
+	}(url)
+}
+
+func handleTimeSlotErr(err error, graphTimeSlots chan GraphTimeSlots) {
+	if urlShouldBeSkipped(err) {
+		graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
+		return
+	}
+	graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Error getting time slot from graph api. - %w", err)}
 }
 
 func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {

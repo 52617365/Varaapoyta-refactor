@@ -2,10 +2,11 @@ package requests
 
 import (
 	"fmt"
-	"golang.org/x/exp/slices"
 	"testing"
 	"varaapoyta-backend-refactor/date"
 	"varaapoyta-backend-refactor/time"
+
+	"golang.org/x/exp/slices"
 )
 
 func TestGetUrl(t *testing.T) {
@@ -22,7 +23,7 @@ func TestGetUrl(t *testing.T) {
 func TestGetUrls(t *testing.T) {
 	restaurantId := "1"
 	expectedUrls := getExpectedUrls()
-	actualUrls := GetGraphApiUrls(restaurantId)
+	actualUrls := GetGraphApiUrlsFrom(restaurantId)
 
 	if len(actualUrls) != len(expectedUrls) {
 		t.Errorf("GetGraphApiUrls - Expected %d urls, got %d", len(expectedUrls), len(actualUrls))

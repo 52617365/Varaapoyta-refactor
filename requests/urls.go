@@ -6,7 +6,7 @@ import (
 	"varaapoyta-backend-refactor/time"
 )
 
-func GetGraphApiUrls(restaurantId string) []string {
+func GetGraphApiUrlsFrom(restaurantId string) []string {
 	var urls []string
 	for _, timeSlot := range time.GetSlotsFromTheFuture() {
 		url := getUrl(restaurantId, timeSlot)
