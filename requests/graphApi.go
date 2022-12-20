@@ -12,6 +12,7 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	urls := GetGraphApiUrls(restaurantId)
 	var allTimeSlots []string
 	for _, url := range urls {
+		// TODO: we want to use goroutines here.
 		timeSlots, err := GetTimeSlotsFrom(url)
 		if err != nil {
 			if urlShouldBeSkipped(err) {
@@ -44,7 +45,7 @@ var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	fromTime := getFromAsCurrentTimeIfSmallerThan(deserializedResponse.Intervals[0].From)
+	fromTime := getFromAsCurrentTimeIfItsSmallerThan(deserializedResponse.Intervals[0].From)
 	timeSlots := time.GetUnixStampsInBetweenTimesAsString(fromTime, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
 }
@@ -94,7 +95,7 @@ func timeIntervalsAreIdentical(deserializedResponse *responseStructures.Relevant
 	return deserializedResponse.Intervals[0].From == deserializedResponse.Intervals[0].To
 }
 
-func getFromAsCurrentTimeIfSmallerThan(from int64) int64 {
+func getFromAsCurrentTimeIfItsSmallerThan(from int64) int64 {
 	var resultFrom int64
 	if currentTimeIsSmallerThanFrom(from) {
 		resultFrom = time.GetCurrentTimeInUnixMs()
