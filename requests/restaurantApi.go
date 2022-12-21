@@ -5,8 +5,14 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"varaapoyta-backend-refactor/responseStructures"
 )
+
+type Restaurants struct {
+	restaurantWithTimeSlots *RestaurantWithTimeSlots
+	err                     error
+}
 
 type RestaurantWithTimeSlots struct {
 	restaurant *responseStructures.Edges
@@ -19,17 +25,42 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 		return nil, err
 	}
 
-	restaurantsWithTimeSlots := make([]RestaurantWithTimeSlots, 0, len(restaurants))
+	wg := sync.WaitGroup{}
+	restaurantsWithTimeSlots := make(chan Restaurants, len(restaurants))
+
 	for _, restaurant := range restaurants {
-		// TODO: we want to use goroutines here.
-		timeSlots, err := GetGraphApiTimeSlotsFrom(restaurant.ReservationPageID)
-		if err != nil {
-			return nil, err
-		}
-		restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: &restaurant, timeSlots: timeSlots}
-		restaurantsWithTimeSlots = append(restaurantsWithTimeSlots, restaurantWithTimeSlots)
+		wg.Add(1)
+		go func(r responseStructures.Edges) {
+			defer wg.Done()
+			// TODO: we want to use goroutines here.
+			timeSlots, err := GetGraphApiTimeSlotsFrom(r.ReservationPageID)
+			if err != nil {
+				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
+				return
+			}
+			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: &r, timeSlots: timeSlots}
+			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
+		}(restaurant)
 	}
-	return restaurantsWithTimeSlots, nil
+	wg.Wait()
+	close(restaurantsWithTimeSlots)
+
+	syncedrestaurantsWithTimeSlots, err := syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots)
+	if err != nil {
+		return nil, err
+	}
+	return syncedrestaurantsWithTimeSlots, nil
+}
+
+func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]RestaurantWithTimeSlots, error) {
+	syncedrestaurantsWithTimeSlots := make([]RestaurantWithTimeSlots, 0, len(restaurantsWithTimeSlots))
+	for restaurantWithTimeSlot := range restaurantsWithTimeSlots {
+		if restaurantWithTimeSlot.err != nil {
+			return nil, restaurantWithTimeSlot.err
+		}
+		syncedrestaurantsWithTimeSlots = append(syncedrestaurantsWithTimeSlots, *restaurantWithTimeSlot.restaurantWithTimeSlots)
+	}
+	return syncedrestaurantsWithTimeSlots, nil
 }
 
 func GetRestaurants(city string) ([]responseStructures.Edges, error) {
