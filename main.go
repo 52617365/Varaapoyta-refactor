@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	restaurants, _ := requests.GetRestaurantsWithTimeSlots("Rovaniemi")
+	restaurants, _ := requests.GetRestaurantsWithTimeSlots("Helsinki")
 	for _, restaurant := range restaurants {
 		fmt.Println(restaurant)
 	}

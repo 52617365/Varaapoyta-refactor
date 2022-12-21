@@ -22,6 +22,7 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	graphTimeSlots := make(chan GraphTimeSlots, len(urls))
 
 	for _, url := range urls {
+		wg.Add(1)
 		getTimeSlotsWithGoRoutine(url, graphTimeSlots, &wg)
 	}
 
@@ -29,12 +30,13 @@ func GetGraphApiTimeSlotsFrom(restaurantId string) ([]string, error) {
 	close(graphTimeSlots)
 
 	allTimeSlots, err := syncGraphTimeSlots(graphTimeSlots)
-
-	return allTimeSlots, err
+	if err != nil {
+		return nil, err
+	}
+	return allTimeSlots, nil
 }
 
 func getTimeSlotsWithGoRoutine(url string, graphTimeSlots chan GraphTimeSlots, wg *sync.WaitGroup) {
-	wg.Add(1)
 	go func(url string) {
 		defer wg.Done()
 		timeSlots, err := GetTimeSlotsFrom(url)
@@ -62,7 +64,7 @@ func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
 			if errors.As(timeSlot.err, &urlShouldBeSkipped) {
 				continue
 			}
-			return []string{}, timeSlot.err
+			return nil, timeSlot.err
 		}
 		syncedTimeSlots = append(syncedTimeSlots, timeSlot.timeSlots...)
 	}
