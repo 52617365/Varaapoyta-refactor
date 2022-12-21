@@ -32,7 +32,6 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 		wg.Add(1)
 		go func(r responseStructures.Edges) {
 			defer wg.Done()
-			// TODO: we want to use goroutines here.
 			timeSlots, err := GetGraphApiTimeSlotsFrom(r.ReservationPageID)
 			if err != nil {
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
@@ -42,14 +41,15 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
 		}(restaurant)
 	}
+
 	wg.Wait()
 	close(restaurantsWithTimeSlots)
 
-	syncedrestaurantsWithTimeSlots, err := syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots)
+	syncedRestaurantsWithTimeSlots, err := syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots)
 	if err != nil {
 		return nil, err
 	}
-	return syncedrestaurantsWithTimeSlots, nil
+	return syncedRestaurantsWithTimeSlots, nil
 }
 
 func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]RestaurantWithTimeSlots, error) {
