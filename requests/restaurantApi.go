@@ -15,8 +15,10 @@ type Restaurants struct {
 }
 
 type RestaurantWithTimeSlots struct {
-	restaurant *responseStructures.Edges
-	timeSlots  []string
+	restaurant               *responseStructures.Edges
+	timeSlots                []string
+	timeTillRestaurantCloses string
+	timeTillKitchenCloses    string
 }
 
 func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error) {
@@ -37,6 +39,8 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
+			// TODO: call function that takes into consideration that if E.g. closing time is 23:00, then the last time slot should be 22:00.
+			// TODO: calculate relative times between current time stamp and kitchen closing time + restaurant closing time and add to restaurantWithTimeSlots.
 			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: &r, timeSlots: timeSlots}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
 		}(restaurant)
