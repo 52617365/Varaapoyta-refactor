@@ -41,7 +41,7 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
-			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges) {
+			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges[0].End) {
 				castedKitchenClosingTime := getKitchenClosingTime(r)
 				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, castedKitchenClosingTime)
 			}
@@ -62,8 +62,8 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 	return syncedRestaurantsWithTimeSlots, nil
 }
 
-func requiredInfoExists(timeSlots []string, kitchenOpeningRanges interface{}) bool {
-	if len(timeSlots) == 0 || kitchenOpeningRanges == nil {
+func requiredInfoExists(timeSlots []string, kitchenClosingTime string) bool {
+	if len(timeSlots) == 0 || kitchenClosingTime == "" {
 		return false
 	}
 	return true
