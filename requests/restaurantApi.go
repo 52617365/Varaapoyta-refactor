@@ -2,11 +2,13 @@ package requests
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"sync"
 	"varaapoyta-backend-refactor/responseStructures"
+	"varaapoyta-backend-refactor/time"
 )
 
 type Restaurants struct {
@@ -32,18 +34,24 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 
 	for _, restaurant := range restaurants {
 		wg.Add(1)
-		go func(r responseStructures.Edges) {
+		go func(r *responseStructures.Edges) {
 			defer wg.Done()
 			timeSlots, err := GetGraphApiTimeSlotsFrom(r.ReservationPageID)
 			if err != nil {
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
+
+			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges) {
+				castedKitchenClosingTime := getKitchenClosingTime(r)
+				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, castedKitchenClosingTime)
+			}
+
 			// TODO: call function that takes into consideration that if E.g. closing time is 23:00, then the last time slot should be 22:00.
 			// TODO: calculate relative times between current time stamp and kitchen closing time + restaurant closing time and add to restaurantWithTimeSlots.
-			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: &r, timeSlots: timeSlots}
+			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: r, timeSlots: timeSlots}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
-		}(restaurant)
+		}(&restaurant)
 	}
 
 	wg.Wait()
@@ -54,6 +62,27 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 		return nil, err
 	}
 	return syncedRestaurantsWithTimeSlots, nil
+}
+
+func requiredInfoExists(timeSlots []string, kitchenOpeningRanges interface{}) bool {
+	if len(timeSlots) == 0 || kitchenOpeningRanges == nil {
+		return false
+	}
+	return true
+}
+
+// TODO: tests for this.
+func getKitchenClosingTime(restaurant *responseStructures.Edges) string {
+	if restaurant.OpeningTime.KitchenTime.Ranges == nil {
+		log.Fatal("getKitchenClosingTime - restaurant.OpeningTime.KitchenTime.Ranges is nil")
+	}
+	kitchenClosingTime, ok := restaurant.OpeningTime.KitchenTime.Ranges.(responseStructures.Ranges)
+	if !ok {
+		log.Fatal("getKitchenClosingTime - unexpected error when casting restaurant.OpeningTime.KitchenTime.Ranges to responseStructures.Ranges")
+	}
+
+	return kitchenClosingTime.Ranges[0].End
+
 }
 
 func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]RestaurantWithTimeSlots, error) {
@@ -167,8 +196,5 @@ func reservationPageExists(reservationUrl string) bool {
 }
 
 func restaurantIsFromCorrectCity(restaurantCity string, usersCity string) bool {
-	if strings.ToLower(restaurantCity) == strings.ToLower(usersCity) {
-		return true
-	}
-	return false
+	return strings.ToLower(restaurantCity) == strings.ToLower(usersCity)
 }

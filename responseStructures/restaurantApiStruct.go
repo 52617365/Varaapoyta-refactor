@@ -47,3 +47,11 @@ type Edges struct {
 		} `json:"homepageLocalized"`
 	}
 }
+
+type Ranges struct {
+	Ranges []struct {
+		Start      string `json:"start"`
+		End        string `json:"end"`
+		EndNextDay bool   `json:"endNextDay"`
+	} `json:"ranges"`
+}
