@@ -23,7 +23,7 @@ func GetCurrentHour() int {
 	return currentHour
 }
 
-func GetCurrentTimeInUnixMs() int64 {
+var GetCurrentTimeInUnixMs = func() int64 {
 	return time.Now().UnixMilli()
 }
 

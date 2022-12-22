@@ -83,7 +83,7 @@ func urlShouldBeSkipped(err error) bool {
 	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
 }
 
-func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
+var syncGraphTimeSlots = func(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
 	syncedTimeSlots := make([]string, 0, 96)
 	for timeSlot := range graphTimeSlots {
 		if timeSlot.err != nil {
@@ -102,7 +102,7 @@ func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
 	return syncedTimeSlots, nil
 }
 
-func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
+var getResponseFromGraphApi = func(requestUrl string) ([]byte, error) {
 	requestHandler := getGraphApiRequestHandler(requestUrl)
 	response, err := sendRequestToGraphApi(requestHandler)
 	if err != nil {

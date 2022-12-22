@@ -51,7 +51,19 @@ func TestGetGraphApiTimeSlotsFrom(t *testing.T) {
 	GetTimeSlotsFrom = originalTimeSlotsFrom
 }
 
-func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {
+func TestGetGraphApiTimeSlotsFrom_error(t *testing.T) {
+	syncGraphTimeSlots = func(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
+		return nil, errors.New("test")
+	}
+
+	_, err := GetGraphApiTimeSlotsFrom("123")
+	if err == nil {
+		t.Errorf("GetGraphApiTimeSlotsFrom - Expected error to not be nil but it was.")
+	}
+
+}
+
+func TestGetTimeSlotFrom_returnsGraphNotVisible(t *testing.T) {
 	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":"transparent"}],"id":281}]`)
 
 	_, err := GetTimeSlotsFrom("test")
@@ -60,7 +72,7 @@ func TestGetTimeSlotFromReturnsGraphNotVisible(t *testing.T) {
 		t.Errorf("getTimeSlotFrom - Expected error to be of type GraphNotVisible but it wasn't.")
 	}
 }
-func TestGetTimeSlotFromReturnsInvalidGraphApiIntervals(t *testing.T) {
+func TestGetTimeSlotFrom_returnsInvalidGraphApiIntervals(t *testing.T) {
 	mockRequestResult(`[{"name": "Stone's","intervals":[{"from":1660330800000,"to":1660330800000,"color":""}],"id":281}]`)
 
 	_, err := GetTimeSlotsFrom("test")
@@ -88,15 +100,13 @@ func TestGetTimeSlotFrom(t *testing.T) {
 	}
 }
 
-func TestUrlShouldBeSkipped(t *testing.T) {
-	if !urlShouldBeSkipped(&GraphNotVisible{}) {
-		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+func TestGetTimeSlotFrom_error(t *testing.T) {
+	getResponseFromGraphApi = func(requestUrl string) ([]byte, error) {
+		return nil, errors.New("test")
 	}
-	if !urlShouldBeSkipped(&InvalidGraphApiIntervals{}) {
-		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
-	}
-	if urlShouldBeSkipped(errors.New("test")) {
-		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
+	_, err := GetTimeSlotsFrom("test")
+	if err == nil {
+		t.Errorf("getTimeSlotFrom - Expected error to not be nil but it was.")
 	}
 }
 
@@ -153,6 +163,44 @@ func TestGetCurrentTimeInUnixMs(t *testing.T) {
 	}
 }
 
+func TestGetFromAsCurrentTimeIfItsSmallerThan_setsFromToCurrentTime(t *testing.T) {
+	var fromTime int64 = 2000
+	time.GetCurrentTimeInUnixMs = func() int64 {
+		return 1000
+	}
+
+	resultFrom := getFromAsCurrentTimeIfItsSmallerThan(fromTime)
+	var expectedFrom int64 = 1000
+
+	if resultFrom != expectedFrom {
+		t.Errorf("getFromAsCurrentTimeIfItsSmallerThan - Expected from to be %d but got %d", expectedFrom, resultFrom)
+	}
+}
+func TestGetFromAsCurrentTimeIfItsSmallerThan_setsFromToFrom(t *testing.T) {
+	var fromTime int64 = 2000
+	time.GetCurrentTimeInUnixMs = func() int64 {
+		return 3000
+	}
+
+	resultFrom := getFromAsCurrentTimeIfItsSmallerThan(fromTime)
+	var expectedFrom int64 = 2000
+
+	if resultFrom != expectedFrom {
+		t.Errorf("getFromAsCurrentTimeIfItsSmallerThan - Expected from to be %d but got %d", expectedFrom, resultFrom)
+	}
+}
+
+func TestUrlShouldBeSkipped(t *testing.T) {
+	if !urlShouldBeSkipped(&GraphNotVisible{}) {
+		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+	}
+	if !urlShouldBeSkipped(&InvalidGraphApiIntervals{}) {
+		t.Errorf("urlShouldBeSkipped - Expected url to be skipped but it wasn't.")
+	}
+	if urlShouldBeSkipped(errors.New("test")) {
+		t.Errorf("urlShouldBeSkipped - Expected url to not be skipped but it was.")
+	}
+}
 func mockRequestResult(returnValue string) {
 	mockResponseBuffer := io.NopCloser(bytes.NewReader([]byte(returnValue)))
 
