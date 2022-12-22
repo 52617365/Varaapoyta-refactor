@@ -48,6 +48,7 @@ type Edges struct {
 	}
 }
 
+// TODO: this structure doesn't seem to be correct.
 type Ranges struct {
 	Ranges []struct {
 		Start      string `json:"start"`

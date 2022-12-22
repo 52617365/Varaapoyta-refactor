@@ -41,13 +41,11 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
-
 			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges) {
 				castedKitchenClosingTime := getKitchenClosingTime(r)
 				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, castedKitchenClosingTime)
 			}
 
-			// TODO: call function that takes into consideration that if E.g. closing time is 23:00, then the last time slot should be 22:00.
 			// TODO: calculate relative times between current time stamp and kitchen closing time + restaurant closing time and add to restaurantWithTimeSlots.
 			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: r, timeSlots: timeSlots}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
@@ -78,6 +76,7 @@ func getKitchenClosingTime(restaurant *responseStructures.Edges) string {
 	}
 	kitchenClosingTime, ok := restaurant.OpeningTime.KitchenTime.Ranges.(responseStructures.Ranges)
 	if !ok {
+		// TODO: fix the reason why this gets hit with restaurants from Helsinki.
 		log.Fatal("getKitchenClosingTime - unexpected error when casting restaurant.OpeningTime.KitchenTime.Ranges to responseStructures.Ranges")
 	}
 

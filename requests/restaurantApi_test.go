@@ -154,3 +154,8 @@ func TestFilterRestaurants(t *testing.T) {
 		}
 	}
 }
+
+func TestGetKitchenClosingTime(t *testing.T) {
+
+	// TODO
+}
