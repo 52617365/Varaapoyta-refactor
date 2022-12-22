@@ -1,9 +1,10 @@
 package time
 
 import (
-	"golang.org/x/exp/slices"
 	"testing"
 	"time"
+
+	"golang.org/x/exp/slices"
 )
 
 func TestGetSlotsFromTheFuture(t *testing.T) {
@@ -95,4 +96,32 @@ func TestGetUnixStampsInBetweenTimesAsString(t *testing.T) {
 		t.Errorf("expected %d, got %d", 3, len(actualUnixStampsInbetweenTimes))
 	}
 
+}
+
+func TestExtractUnwantedTimeSlots(t *testing.T) {
+	timeSlots := []string{"1300", "1315", "1330", "1345", "1400", "1415", "1430", "1445"}
+	kitchenClosingTime := "14:45"
+
+	wantedTimeSlots := ExtractUnwantedTimeSlots(timeSlots, kitchenClosingTime)
+	expectedTimeSlots := []string{"1300", "1315", "1330", "1345"}
+
+	if len(wantedTimeSlots) != len(expectedTimeSlots) {
+		t.Errorf("expected %d, got %d", len(expectedTimeSlots), len(wantedTimeSlots))
+	}
+	for _, time := range expectedTimeSlots {
+		if !slices.Contains(wantedTimeSlots, time) {
+			t.Errorf("wantedTimeSlots does not contain %s", time)
+		}
+	}
+}
+
+func TestExtractUnwantedTimeSlotsReturnsEmpty(t *testing.T) {
+	timeSlots := []string{"1300", "1315", "1330", "1345", "1400", "1415", "1430", "1445"}
+	kitchenClosingTime := "13:45"
+
+	wantedTimeSlots := ExtractUnwantedTimeSlots(timeSlots, kitchenClosingTime)
+
+	if len(wantedTimeSlots) != 0 {
+		t.Errorf("expected %d, got %d", 0, len(wantedTimeSlots))
+	}
 }

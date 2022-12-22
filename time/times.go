@@ -1,6 +1,7 @@
 package time
 
 import (
+	"log"
 	"time"
 )
 
@@ -71,4 +72,45 @@ func getUnixStampsInbetweenTimes(from int64, to int64) []int64 {
 		}
 	}
 	return unixStampsInbetweenTimes
+}
+
+func ExtractUnwantedTimeSlots(timeSlots []string, kitchenClosingTime string) []string {
+	if timeSlots == nil || kitchenClosingTime == "" {
+		// This hopefully never gets hit.
+		log.Fatal("timeSlots or kitchenClosingTime is nil")
+	}
+
+	closingTime := convertStringToTime(kitchenClosingTime)
+
+	timeSlotsNotInClosingRange := make([]string, 0, len(timeSlots))
+
+	for _, timeSlot := range timeSlots {
+		timeSlotTime := convertTimeSlotToTime(timeSlot)
+		if !isInClosingRange(timeSlotTime, closingTime) {
+			timeSlotsNotInClosingRange = append(timeSlotsNotInClosingRange, timeSlot)
+		}
+	}
+	return timeSlotsNotInClosingRange
+}
+
+func convertTimeSlotToTime(timeSlot string) time.Time {
+	// time slots are stored as "1400", so we need to format it to "14:00" before we can convert it to a time.Time.
+	formattedTimeSlot := formatTimeWithColon(timeSlot)
+	t := convertStringToTime(formattedTimeSlot)
+	return t
+}
+
+func formatTimeWithColon(timeSlot string) string {
+	formattedTimeSlot := timeSlot[:2] + ":" + timeSlot[2:4]
+	return formattedTimeSlot
+}
+
+func convertStringToTime(timeString string) time.Time {
+	t, _ := time.Parse("15:04", timeString)
+	return t
+}
+
+func isInClosingRange(timeSlot time.Time, kitchenClosingTime time.Time) bool {
+	kitchenClosingTime = kitchenClosingTime.Add(-1 * time.Hour) // minus 1h from the time bcuz restaurants don't take reservations for the last hour of the day.
+	return timeSlot.After(kitchenClosingTime)
 }
