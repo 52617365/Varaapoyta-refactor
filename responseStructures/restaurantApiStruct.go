@@ -32,7 +32,7 @@ type Edges struct {
 	} `json:"features"`
 	OpeningTime struct {
 		RestaurantTime struct {
-			Ranges interface{} `json:"ranges"`
+			Ranges []Ranges `json:"ranges"`
 		} `json:"restaurantTime"`
 		KitchenTime struct {
 			Ranges []Ranges `json:"ranges"`
