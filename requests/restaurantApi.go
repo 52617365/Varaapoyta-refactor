@@ -190,5 +190,5 @@ func reservationPageExists(reservationUrl string) bool {
 }
 
 func restaurantIsFromCorrectCity(restaurantCity string, usersCity string) bool {
-	return strings.ToLower(restaurantCity) == strings.ToLower(usersCity)
+	return strings.EqualFold(restaurantCity, usersCity)
 }
