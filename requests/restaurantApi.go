@@ -74,14 +74,9 @@ func getKitchenClosingTime(restaurant *responseStructures.Edges) string {
 	if restaurant.OpeningTime.KitchenTime.Ranges == nil {
 		log.Fatal("getKitchenClosingTime - restaurant.OpeningTime.KitchenTime.Ranges is nil")
 	}
-	kitchenClosingTime, ok := restaurant.OpeningTime.KitchenTime.Ranges.(responseStructures.Ranges)
-	if !ok {
-		// TODO: fix the reason why this gets hit with restaurants from Helsinki.
-		log.Fatal("getKitchenClosingTime - unexpected error when casting restaurant.OpeningTime.KitchenTime.Ranges to responseStructures.Ranges")
-	}
+	kitchenClosingTime := restaurant.OpeningTime.KitchenTime.Ranges[0].End
 
-	return kitchenClosingTime.Ranges[0].End
-
+	return kitchenClosingTime
 }
 
 func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]RestaurantWithTimeSlots, error) {
