@@ -45,8 +45,11 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, getKitchenClosingTime(r))
 			}
 
-			// TODO: calculate relative times between current time stamp and kitchen closing time + restaurant closing time and add to restaurantWithTimeSlots.
-			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: r, timeSlots: timeSlots}
+			// TODO: these two are currently not ok. They return weird values, fix and we gucci.
+			timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(r))
+			timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(r))
+			//
+			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: r, timeSlots: timeSlots, timeTillRestaurantCloses: timeToRestaurantClosing, timeTillKitchenCloses: timeToKitchenClosing}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
 		}(&restaurant)
 	}

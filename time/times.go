@@ -36,6 +36,15 @@ func convertUnixToFinnishTime(unix int64) time.Time {
 	return t
 }
 
+// TODO: this is not correct. FIX
+func CalcRelativeTimeToFromCurrentTime(closingTime string) string {
+	closingTimeToTimeType := ConvertStringToTime(closingTime)
+	currentTime := time.Now()
+	relative := getTimeDifferenceBetweenTwoTimes(currentTime, closingTimeToTimeType)
+	result := relative.String()
+	return result
+}
+
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {
 	return endTime.Sub(startTime)
 }
@@ -80,7 +89,7 @@ func ExtractUnwantedTimeSlots(timeSlots []string, kitchenClosingTime string) []s
 		log.Fatal("timeSlots or kitchenClosingTime is nil")
 	}
 
-	closingTime := convertStringToTime(kitchenClosingTime)
+	closingTime := ConvertStringToTime(kitchenClosingTime)
 
 	timeSlotsNotInClosingRange := make([]string, 0, len(timeSlots))
 
@@ -96,7 +105,7 @@ func ExtractUnwantedTimeSlots(timeSlots []string, kitchenClosingTime string) []s
 func convertTimeSlotToTime(timeSlot string) time.Time {
 	// time slots are stored as "1400", so we need to format it to "14:00" before we can convert it to a time.Time.
 	formattedTimeSlot := formatTimeWithColon(timeSlot)
-	t := convertStringToTime(formattedTimeSlot)
+	t := ConvertStringToTime(formattedTimeSlot)
 	return t
 }
 
@@ -105,7 +114,7 @@ func formatTimeWithColon(timeSlot string) string {
 	return formattedTimeSlot
 }
 
-func convertStringToTime(timeString string) time.Time {
+func ConvertStringToTime(timeString string) time.Time {
 	t, _ := time.Parse("15:04", timeString)
 	return t
 }
