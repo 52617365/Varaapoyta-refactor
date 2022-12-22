@@ -53,10 +53,7 @@ func getGraphApiHandler(api *Api) *http.Request {
 }
 
 func graphApiUrlExists(api *Api) bool {
-	if api.Url == "" {
-		return false
-	}
-	return true
+	return api.Url != ""
 }
 func setGraphApiHeadersTo(r *http.Request) {
 	r.Header.Add("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
@@ -104,10 +101,8 @@ func deserializeResponse(response []byte, responseStructure interface{}) (interf
 	switch responseStructure.(type) {
 	case *responseStructures.GraphApiResponse:
 		typeOfStructure = &responseStructures.GraphApiResponse{}
-		break
 	case *responseStructures.RestaurantApiResponse:
 		typeOfStructure = &responseStructures.RestaurantApiResponse{}
-		break
 	default:
 		log.Fatal("Invalid response structure")
 	}
