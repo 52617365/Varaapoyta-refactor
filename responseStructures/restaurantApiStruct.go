@@ -35,7 +35,7 @@ type Edges struct {
 			Ranges interface{} `json:"ranges"`
 		} `json:"restaurantTime"`
 		KitchenTime struct {
-			Ranges interface{} `json:"ranges"`
+			Ranges []Ranges `json:"ranges"`
 		} `json:"kitchenTime"`
 	} `json:"openingTime"`
 	Links struct {
@@ -50,9 +50,7 @@ type Edges struct {
 
 // TODO: this structure doesn't seem to be correct.
 type Ranges struct {
-	Ranges []struct {
-		Start      string `json:"start"`
-		End        string `json:"end"`
-		EndNextDay bool   `json:"endNextDay"`
-	} `json:"ranges"`
+	Start      string `json:"start"`
+	End        string `json:"end"`
+	EndNextDay bool   `json:"endNextDay"`
 }
