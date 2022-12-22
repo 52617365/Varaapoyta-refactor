@@ -42,8 +42,7 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				return
 			}
 			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges[0].End) {
-				castedKitchenClosingTime := getKitchenClosingTime(r)
-				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, castedKitchenClosingTime)
+				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, getKitchenClosingTime(r))
 			}
 
 			// TODO: calculate relative times between current time stamp and kitchen closing time + restaurant closing time and add to restaurantWithTimeSlots.
@@ -69,7 +68,6 @@ func requiredInfoExists(timeSlots []string, kitchenClosingTime string) bool {
 	return true
 }
 
-// TODO: tests for this.
 func getKitchenClosingTime(restaurant *responseStructures.Edges) string {
 	if restaurant.OpeningTime.KitchenTime.Ranges == nil {
 		log.Fatal("getKitchenClosingTime - restaurant.OpeningTime.KitchenTime.Ranges is nil")
@@ -77,6 +75,14 @@ func getKitchenClosingTime(restaurant *responseStructures.Edges) string {
 	kitchenClosingTime := restaurant.OpeningTime.KitchenTime.Ranges[0].End
 
 	return kitchenClosingTime
+}
+func getRestaurantClosingTime(restaurant *responseStructures.Edges) string {
+	if restaurant.OpeningTime.RestaurantTime.Ranges == nil {
+		log.Fatal("getRestaurantClosingTime - restaurant.OpeningTime.RestaurantTime.Ranges is nil")
+	}
+	restaurantClosingTime := restaurant.OpeningTime.RestaurantTime.Ranges[0].End
+
+	return restaurantClosingTime
 }
 
 func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]RestaurantWithTimeSlots, error) {
