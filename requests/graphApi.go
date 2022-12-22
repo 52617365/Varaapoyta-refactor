@@ -7,6 +7,8 @@ import (
 	"sync"
 	"varaapoyta-backend-refactor/responseStructures"
 	"varaapoyta-backend-refactor/time"
+
+	"golang.org/x/exp/slices"
 )
 
 type GraphTimeSlots struct {
@@ -48,35 +50,6 @@ func getTimeSlotsWithGoRoutine(url string, graphTimeSlots chan GraphTimeSlots, w
 	}(url)
 }
 
-func handleTimeSlotErr(err error, graphTimeSlots chan GraphTimeSlots) {
-	if urlShouldBeSkipped(err) {
-		graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
-		return
-	}
-	graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Raflaamo graph api might be down. - %w", err)}
-}
-
-func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
-	syncedTimeSlots := make([]string, 0, 96)
-	for timeSlot := range graphTimeSlots {
-		if timeSlot.err != nil {
-			urlShouldBeSkipped := &UrlShouldBeSkipped{}
-			if errors.As(timeSlot.err, &urlShouldBeSkipped) {
-				continue
-			}
-			return nil, timeSlot.err
-		}
-		syncedTimeSlots = append(syncedTimeSlots, timeSlot.timeSlots...)
-	}
-	return syncedTimeSlots, nil
-}
-
-func urlShouldBeSkipped(err error) bool {
-	graphIsMissing := &GraphNotVisible{}
-	invalidGraphIntervals := &InvalidGraphApiIntervals{}
-	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
-}
-
 var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	response, err := getResponseFromGraphApi(requestUrl)
 	if err != nil {
@@ -94,6 +67,39 @@ var GetTimeSlotsFrom = func(requestUrl string) ([]string, error) {
 	fromTime := getFromAsCurrentTimeIfItsSmallerThan(deserializedResponse.Intervals[0].From)
 	timeSlots := time.GetUnixStampsInBetweenTimesAsString(fromTime, deserializedResponse.Intervals[0].To)
 	return timeSlots, nil
+}
+
+func handleTimeSlotErr(err error, graphTimeSlots chan GraphTimeSlots) {
+	if urlShouldBeSkipped(err) {
+		graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: &UrlShouldBeSkipped{}}
+		return
+	}
+	graphTimeSlots <- GraphTimeSlots{timeSlots: nil, err: fmt.Errorf("GetTimeSlotsFrom - Raflaamo graph api might be down. - %w", err)}
+}
+
+func urlShouldBeSkipped(err error) bool {
+	graphIsMissing := &GraphNotVisible{}
+	invalidGraphIntervals := &InvalidGraphApiIntervals{}
+	return errors.As(err, &graphIsMissing) || errors.As(err, &invalidGraphIntervals)
+}
+
+func syncGraphTimeSlots(graphTimeSlots chan GraphTimeSlots) ([]string, error) {
+	syncedTimeSlots := make([]string, 0, 96)
+	for timeSlot := range graphTimeSlots {
+		if timeSlot.err != nil {
+			urlShouldBeSkipped := &UrlShouldBeSkipped{}
+			if errors.As(timeSlot.err, &urlShouldBeSkipped) {
+				continue
+			}
+			return nil, timeSlot.err
+		}
+		for _, timeSlot := range timeSlot.timeSlots {
+			if !slices.Contains(syncedTimeSlots, timeSlot) {
+				syncedTimeSlots = append(syncedTimeSlots, timeSlot)
+			}
+		}
+	}
+	return syncedTimeSlots, nil
 }
 
 func getResponseFromGraphApi(requestUrl string) ([]byte, error) {
@@ -121,6 +127,15 @@ func getGraphApiRequestHandler(requestUrl string) *http.Request {
 func sendRequestToGraphApi(requestHandler *http.Request) (*http.Response, error) {
 	response, err := sendRequest(requestHandler)
 	return response, err
+}
+
+var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
+	deserializedResponse, err := deserializeResponse(responseBuffer, &responseStructures.GraphApiResponse{})
+	if err != nil {
+		return &responseStructures.RelevantIndex{}, err
+	}
+	result := deserializedResponse.(*responseStructures.GraphApiResponse)
+	return &(*result)[0], nil
 }
 
 func errOnInvalidData(deserializedResponse *responseStructures.RelevantIndex) error {
@@ -153,13 +168,4 @@ func getFromAsCurrentTimeIfItsSmallerThan(from int64) int64 {
 func currentTimeIsSmallerThanFrom(from int64) bool {
 	currentTimeUnix := time.GetCurrentTimeInUnixMs()
 	return from > currentTimeUnix
-}
-
-var deserializeGraphApiResponse = func(responseBuffer []byte) (*responseStructures.RelevantIndex, error) {
-	deserializedResponse, err := deserializeResponse(responseBuffer, &responseStructures.GraphApiResponse{})
-	if err != nil {
-		return &responseStructures.RelevantIndex{}, err
-	}
-	result := deserializedResponse.(*responseStructures.GraphApiResponse)
-	return &(*result)[0], nil
 }
