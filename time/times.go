@@ -36,13 +36,32 @@ func convertUnixToFinnishTime(unix int64) time.Time {
 	return t
 }
 
-// TODO: this is not correct. FIX
-func CalcRelativeTimeToFromCurrentTime(closingTime string) string {
-	closingTimeToTimeType := ConvertStringToTime(closingTime)
-	currentTime := time.Now()
-	relative := getTimeDifferenceBetweenTwoTimes(currentTime, closingTimeToTimeType)
-	result := relative.String()
-	return result
+type RelativeTime struct{
+	hour int
+	minute int
+}
+func CalcRelativeTimeToFromCurrentTime(closingTime string) *RelativeTime {
+	closingTimeToTimeType := FormatStringTimeToTimeType(closingTime)
+	currentTimeToTimeType := getCurrentTimeMatchingClosingFormat()
+
+	relative := getTimeDifferenceBetweenTwoTimes(currentTimeToTimeType, closingTimeToTimeType)
+
+	result := RelativeTime{
+		hour: int(relative.Seconds()) / 3600,
+		minute: int(relative.Seconds() / 60) % 60,
+	}
+	return &result
+}
+
+func getCurrentTimeMatchingClosingFormat() time.Time {
+	var currentTime string = getFormattedCurrentTime()
+	currentTimeToTimeType := FormatStringTimeToTimeType(currentTime)
+	return currentTimeToTimeType
+}
+
+func getFormattedCurrentTime() string {
+	currentTime := time.Now().Format("15:04")
+	return currentTime
 }
 
 func getTimeDifferenceBetweenTwoTimes(startTime time.Time, endTime time.Time) time.Duration {
@@ -89,7 +108,7 @@ func ExtractUnwantedTimeSlots(timeSlots []string, kitchenClosingTime string) []s
 		log.Fatal("timeSlots or kitchenClosingTime is nil")
 	}
 
-	closingTime := ConvertStringToTime(kitchenClosingTime)
+	closingTime := FormatStringTimeToTimeType(kitchenClosingTime)
 
 	timeSlotsNotInClosingRange := make([]string, 0, len(timeSlots))
 
@@ -105,7 +124,7 @@ func ExtractUnwantedTimeSlots(timeSlots []string, kitchenClosingTime string) []s
 func convertTimeSlotToTime(timeSlot string) time.Time {
 	// time slots are stored as "1400", so we need to format it to "14:00" before we can convert it to a time.Time.
 	formattedTimeSlot := formatTimeWithColon(timeSlot)
-	t := ConvertStringToTime(formattedTimeSlot)
+	t := FormatStringTimeToTimeType(formattedTimeSlot)
 	return t
 }
 
@@ -114,8 +133,9 @@ func formatTimeWithColon(timeSlot string) string {
 	return formattedTimeSlot
 }
 
-func ConvertStringToTime(timeString string) time.Time {
-	t, _ := time.Parse("15:04", timeString)
+func FormatStringTimeToTimeType(timeString string) time.Time {
+	const layout = "15:04"
+	t, _ := time.Parse(layout, timeString)
 	return t
 }
 
