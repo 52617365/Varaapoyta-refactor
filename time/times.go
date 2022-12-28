@@ -37,8 +37,8 @@ func convertUnixToFinnishTime(unix int64) time.Time {
 }
 
 type RelativeTime struct{
-	hour int
-	minute int
+	Hour int `json:"hour"`
+	Minute int `json:"minute"`
 }
 func CalcRelativeTimeToFromCurrentTime(closingTime string) *RelativeTime {
 	closingTimeToTimeType := FormatStringTimeToTimeType(closingTime)
@@ -47,8 +47,8 @@ func CalcRelativeTimeToFromCurrentTime(closingTime string) *RelativeTime {
 	relative := getTimeDifferenceBetweenTwoTimes(currentTimeToTimeType, closingTimeToTimeType)
 
 	result := RelativeTime{
-		hour: int(relative.Seconds()) / 3600,
-		minute: int(relative.Seconds() / 60) % 60,
+		Hour: int(relative.Seconds()) / 3600,
+		Minute: int(relative.Seconds() / 60) % 60,
 	}
 	return &result
 }

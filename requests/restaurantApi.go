@@ -17,10 +17,10 @@ type Restaurants struct {
 }
 
 type RestaurantWithTimeSlots struct {
-	restaurant               *responseStructures.Edges
-	timeSlots                []string
-	timeTillRestaurantCloses *time.RelativeTime
-	timeTillKitchenCloses    *time.RelativeTime
+	Restaurant               *responseStructures.Edges `json:"restaurant"`
+	TimeSlots                []string `json:"timeSlots"`
+	TimeTillRestaurantCloses *time.RelativeTime `json:"timeTillRestaurantCloses"`
+	TimeTillKitchenCloses    *time.RelativeTime `json:"timeTillKitchenCloses"`
 }
 
 func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error) {
@@ -48,7 +48,7 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 			timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(r))
 			timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(r))
 
-			restaurantWithTimeSlots := RestaurantWithTimeSlots{restaurant: r, timeSlots: timeSlots, timeTillRestaurantCloses: timeToRestaurantClosing, timeTillKitchenCloses: timeToKitchenClosing}
+			restaurantWithTimeSlots := RestaurantWithTimeSlots{Restaurant: r, TimeSlots: timeSlots, TimeTillRestaurantCloses: timeToRestaurantClosing, TimeTillKitchenCloses: timeToKitchenClosing}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
 		}(&restaurant)
 	}
@@ -93,7 +93,7 @@ func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]
 		if restaurantWithTimeSlot.err != nil {
 			return nil, restaurantWithTimeSlot.err
 		}
-		if !timeSlotsFound(restaurantWithTimeSlot.restaurantWithTimeSlots.timeSlots) {
+		if !timeSlotsFound(restaurantWithTimeSlot.restaurantWithTimeSlots.TimeSlots) {
 			continue
 		}
 		syncedrestaurantsWithTimeSlots = append(syncedrestaurantsWithTimeSlots, *restaurantWithTimeSlot.restaurantWithTimeSlots)
