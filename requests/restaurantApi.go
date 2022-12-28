@@ -93,9 +93,16 @@ func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]
 		if restaurantWithTimeSlot.err != nil {
 			return nil, restaurantWithTimeSlot.err
 		}
+		if !timeSlotsFound(restaurantWithTimeSlot.restaurantWithTimeSlots.timeSlots) {
+			continue
+		}
 		syncedrestaurantsWithTimeSlots = append(syncedrestaurantsWithTimeSlots, *restaurantWithTimeSlot.restaurantWithTimeSlots)
 	}
 	return syncedrestaurantsWithTimeSlots, nil
+}
+
+func timeSlotsFound(timeSlots []string) bool {
+	return len(timeSlots) != 0
 }
 
 func GetRestaurants(city string) ([]responseStructures.Edges, error) {
