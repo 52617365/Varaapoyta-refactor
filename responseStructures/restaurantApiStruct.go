@@ -11,7 +11,7 @@ type RestaurantApiResponse struct {
 
 type Edges struct {
 	ID                string `json:"id"`
-	ReservationPageID string `json:"-"`
+	ReservationPageID string `json:"reservationPageId"`
 	Name              struct {
 		FiFI string `json:"fi_FI"`
 	} `json:"name"`
