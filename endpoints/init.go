@@ -6,6 +6,7 @@ import (
 	"strings"
 	"varaapoyta-backend-refactor/requests"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/exp/slices"
 )
@@ -17,7 +18,8 @@ func InitApi() {
 }
 
 func InitEndpoints(router *gin.Engine) {
-	router.GET("/tables/:city", func(c *gin.Context) {
+		setCorsRules(router)
+		router.GET("/tables/:city", func(c *gin.Context) {
 		city := c.Param("city")
 		if !cityIsValid(city) {
 			c.JSON(http.StatusBadRequest, "Provided city does not exist on the Raflaamo page.")
@@ -39,6 +41,11 @@ func InitEndpoints(router *gin.Engine) {
 	})
 }
 
+func setCorsRules(router *gin.Engine) {
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://raflaamo.rasmusmaki.com/"},
+	}))
+}
 
 func cityIsValid(city string) bool {
 	return cityIsOnRaflaamoList(city) 
@@ -47,4 +54,5 @@ func cityIsValid(city string) bool {
 func cityIsOnRaflaamoList(city string) bool {
 	return slices.Contains(allPossibleCities, strings.ToLower(city))
 }
+
 
