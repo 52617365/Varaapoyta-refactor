@@ -34,23 +34,24 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 
 	for _, restaurant := range restaurants {
 		wg.Add(1)
-		go func(r *responseStructures.Edges) {
+		restaurant := restaurant
+		go func() {
 			defer wg.Done()
-			timeSlots, err := GetGraphApiTimeSlotsFrom(r.ReservationPageID)
+			timeSlots, err := GetGraphApiTimeSlotsFrom(restaurant.ReservationPageID)
 			if err != nil {
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
-			if requiredInfoExists(timeSlots, r.OpeningTime.KitchenTime.Ranges[0].End) {
-				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, getKitchenClosingTime(r))
+			if requiredInfoExists(timeSlots, restaurant.OpeningTime.KitchenTime.Ranges[0].End) {
+				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, getKitchenClosingTime(&restaurant))
 			}
 
-			timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(r))
-			timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(r))
+			timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(&restaurant))
+			timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(&restaurant))
 
-			restaurantWithTimeSlots := RestaurantWithTimeSlots{Restaurant: r, TimeSlots: timeSlots, TimeTillRestaurantCloses: timeToRestaurantClosing, TimeTillKitchenCloses: timeToKitchenClosing}
+			restaurantWithTimeSlots := RestaurantWithTimeSlots{Restaurant: &restaurant, TimeSlots: timeSlots, TimeTillRestaurantCloses: timeToRestaurantClosing, TimeTillKitchenCloses: timeToKitchenClosing}
 			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
-		}(&restaurant)
+		}()
 	}
 
 	wg.Wait()
