@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 	"varaapoyta-backend-refactor/requests"
@@ -30,14 +29,7 @@ func InitEndpoints(router *gin.Engine) {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
-		if response, err := json.Marshal(restaurantsWithTimeSlots); err == nil {
-			endpointResponse := string(response)
-			c.JSON(http.StatusOK, endpointResponse)
-			return
-		} else {
-			c.JSON(http.StatusInternalServerError, "Error marshaling the raflaamo response.")
-			return
-		}
+		c.JSON(http.StatusOK, restaurantsWithTimeSlots)
 	})
 }
 
