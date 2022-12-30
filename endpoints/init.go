@@ -36,7 +36,10 @@ func InitEndpoints(router *gin.Engine) {
 
 func setCorsRules(router *gin.Engine) {
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"https://raflaamo.rasmusmaki.com"},
+		AllowOrigins:  []string{"https://raflaamo.rasmusmaki.com"},
+		AllowMethods:  []string{"GET"},
+		AllowHeaders:  []string{"Origin"},
+		ExposeHeaders: []string{"Content-Length"},
 	}))
 }
 
