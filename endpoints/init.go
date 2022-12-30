@@ -36,7 +36,7 @@ func InitEndpoints(router *gin.Engine) {
 
 func setCorsRules(router *gin.Engine) {
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000", "https://raflaamo.rasmusmaki.com/"},
+		AllowOrigins: []string{"https://raflaamo.rasmusmaki.com"},
 	}))
 }
 
