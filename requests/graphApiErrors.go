@@ -15,5 +15,11 @@ func (m *GraphNotVisible) Error() string {
 type UrlShouldBeSkipped struct{}
 
 func (m *UrlShouldBeSkipped) Error() string {
-	return "Url should be skipped."
+	return "url should be skipped."
+}
+
+type RequiredInfoDoesNotExist struct{}
+
+func (m *RequiredInfoDoesNotExist) Error() string {
+	return "required info doesn't exist"
 }

@@ -42,15 +42,15 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: err}
 				return
 			}
-			if requiredInfoExists(timeSlots, restaurant.OpeningTime.KitchenTime.Ranges[0].End) {
+			if requiredInfoExists(timeSlots, restaurant.OpeningTime.KitchenTime.Ranges) {
 				timeSlots = time.ExtractUnwantedTimeSlots(timeSlots, getKitchenClosingTime(&restaurant))
+				timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(&restaurant))
+				timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(&restaurant))
+				restaurantWithTimeSlots := RestaurantWithTimeSlots{Restaurant: &restaurant, TimeSlots: timeSlots, TimeTillRestaurantCloses: timeToRestaurantClosing, TimeTillKitchenCloses: timeToKitchenClosing}
+				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
+			} else {
+				restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: nil, err: &RequiredInfoDoesNotExist{}}
 			}
-
-			timeToRestaurantClosing := time.CalcRelativeTimeToFromCurrentTime(getRestaurantClosingTime(&restaurant))
-			timeToKitchenClosing := time.CalcRelativeTimeToFromCurrentTime(getKitchenClosingTime(&restaurant))
-
-			restaurantWithTimeSlots := RestaurantWithTimeSlots{Restaurant: &restaurant, TimeSlots: timeSlots, TimeTillRestaurantCloses: timeToRestaurantClosing, TimeTillKitchenCloses: timeToKitchenClosing}
-			restaurantsWithTimeSlots <- Restaurants{restaurantWithTimeSlots: &restaurantWithTimeSlots, err: nil}
 		}()
 	}
 
@@ -64,8 +64,11 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 	return syncedRestaurantsWithTimeSlots, nil
 }
 
-func requiredInfoExists(timeSlots []string, kitchenClosingTime string) bool {
-	if len(timeSlots) == 0 || kitchenClosingTime == "" {
+func requiredInfoExists(timeSlots []string, kitchenClosingRanges []responseStructures.Ranges) bool {
+	if kitchenClosingRanges == nil {
+		return false
+	}
+	if len(timeSlots) == 0 || kitchenClosingRanges[0].End == "" {
 		return false
 	}
 	return true
@@ -92,6 +95,9 @@ func syncRestaurantsWithTimeSlots(restaurantsWithTimeSlots chan Restaurants) ([]
 	syncedrestaurantsWithTimeSlots := make([]RestaurantWithTimeSlots, 0, len(restaurantsWithTimeSlots))
 	for restaurantWithTimeSlot := range restaurantsWithTimeSlots {
 		if restaurantWithTimeSlot.err != nil {
+			if errors.Is(restaurantWithTimeSlot.err, &RequiredInfoDoesNotExist{}) {
+				continue
+			}
 			return nil, restaurantWithTimeSlot.err
 		}
 		if !timeSlotsFound(restaurantWithTimeSlot.restaurantWithTimeSlots.TimeSlots) {
