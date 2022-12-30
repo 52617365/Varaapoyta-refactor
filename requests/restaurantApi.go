@@ -65,10 +65,7 @@ func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error)
 }
 
 func requiredInfoExists(timeSlots []string, kitchenClosingRanges []responseStructures.Ranges) bool {
-	if kitchenClosingRanges == nil {
-		return false
-	}
-	if len(timeSlots) == 0 || kitchenClosingRanges[0].End == "" {
+	if kitchenClosingRanges == nil || len(timeSlots) == 0 || kitchenClosingRanges[0].End == "" {
 		return false
 	}
 	return true
