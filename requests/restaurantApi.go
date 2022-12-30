@@ -18,9 +18,9 @@ type Restaurants struct {
 
 type RestaurantWithTimeSlots struct {
 	Restaurant               *responseStructures.Edges `json:"restaurant"`
-	TimeSlots                []string `json:"timeSlots"`
-	TimeTillRestaurantCloses *time.RelativeTime `json:"timeTillRestaurantCloses"`
-	TimeTillKitchenCloses    *time.RelativeTime `json:"timeTillKitchenCloses"`
+	TimeSlots                []string                  `json:"timeSlots"`
+	TimeTillRestaurantCloses *time.RelativeTime        `json:"timeTillRestaurantCloses"`
+	TimeTillKitchenCloses    *time.RelativeTime        `json:"timeTillKitchenCloses"`
 }
 
 func GetRestaurantsWithTimeSlots(city string) ([]RestaurantWithTimeSlots, error) {
